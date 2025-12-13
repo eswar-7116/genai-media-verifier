@@ -2,6 +2,7 @@ import os
 from PIL import Image
 from utils.video_utils import extract_frames
 from models.deepfake_detector import predict_image
+from services.report_generator import generate_report
 
 def analyze_video(video_path):
     frames_dir = "temp_frames"
@@ -31,8 +32,17 @@ def analyze_video(video_path):
     else:
         risk = "Low"
 
+    report = generate_report(
+        media_type="video",
+        fake_probability=avg_prob,
+        risk_level=risk,
+        frames_analyzed=len(frame_scores)
+    )
+
     return {
         "frames_analyzed": len(frame_scores),
         "average_fake_probability": round(avg_prob, 2),
-        "risk_level": risk
+        "risk_level": risk,
+        "report": report
     }
+

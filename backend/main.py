@@ -29,7 +29,11 @@ async def analyze_image(file: UploadFile = File(...)):
     else:
         risk = "Low"
 
-    report = generate_report(fake_prob, risk)
+    report = generate_report(
+        media_type="image",
+        fake_probability=fake_prob,
+        risk_level=risk
+    )
 
     return {
         "fake_probability": round(fake_prob, 2),
