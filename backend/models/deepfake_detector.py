@@ -1,0 +1,26 @@
+import torch
+from transformers import AutoImageProcessor, AutoModelForImageClassification
+from PIL import Image
+
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
+# Load pretrained deepfake model
+processor = AutoImageProcessor.from_pretrained(
+    "prithivMLmods/Deep-Fake-Detector-Model"
+)
+
+model = AutoModelForImageClassification.from_pretrained(
+    "prithivMLmods/Deep-Fake-Detector-Model"
+).to(DEVICE)
+
+model.eval()
+
+def predict_image(image: Image.Image):
+    inputs = processor(images=image, return_tensors="pt").to(DEVICE)
+
+    with torch.no_grad():
+        outputs = model(**inputs)
+        probs = torch.softmax(outputs.logits, dim=1)
+
+    fake_prob = probs[0][1].item()   # index 1 = fake
+    return fake_prob

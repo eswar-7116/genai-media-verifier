@@ -3,7 +3,8 @@ from fastapi import FastAPI, UploadFile, File
 import os, shutil
 
 from utils.image_utils import preprocess_image
-from models.image_detector import predict_image
+from models.deepfake_detector import predict_image
+
 
 app = FastAPI()
 
