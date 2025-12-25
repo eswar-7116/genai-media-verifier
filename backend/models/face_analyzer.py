@@ -122,6 +122,14 @@ class FaceAnalyzer:
         """Initialize enhanced OpenCV detection with DNN face detector"""
         self.use_mediapipe = False
         
+        # Always initialize these for fallback use
+        self.face_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+        )
+        self.eye_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + 'haarcascade_eye.xml'
+        )
+        
         try:
             model_dir = os.path.join(os.path.dirname(__file__), '..', 'models_cache')
             prototxt_path = os.path.join(model_dir, 'deploy.prototxt')
@@ -153,12 +161,6 @@ class FaceAnalyzer:
             print(f"  DNN face detector failed: {e}")
         
         self.use_dnn = False
-        self.face_cascade = cv2.CascadeClassifier(
-            cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
-        )
-        self.eye_cascade = cv2.CascadeClassifier(
-            cv2.data.haarcascades + 'haarcascade_eye.xml'
-        )
         print("✓ OpenCV Haar Cascade face detection initialized")
     
     def __del__(self):
@@ -229,9 +231,9 @@ class FaceAnalyzer:
         """Detect facial landmarks"""
         if self.use_mediapipe and self.detector:
             try:
-                from mediapipe import Image as MPImage
+                import mediapipe as mp
                 
-                mp_image = MPImage(image_format=MPImage.ImageFormat.SRGB, data=image)
+                mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=image)
                 detection_result = self.detector.detect(mp_image)
                 
                 if not detection_result.face_landmarks:

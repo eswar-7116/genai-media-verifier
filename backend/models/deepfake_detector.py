@@ -6,11 +6,11 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Load pretrained deepfake model
 processor = AutoImageProcessor.from_pretrained(
-    "prithivMLmods/Deep-Fake-Detector-Model"
+    "dima806/deepfake_vs_real_image_detection"
 )
 
 model = AutoModelForImageClassification.from_pretrained(
-    "prithivMLmods/Deep-Fake-Detector-Model"
+    "dima806/deepfake_vs_real_image_detection"
 ).to(DEVICE)
 
 model.eval()

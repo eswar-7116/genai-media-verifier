@@ -1,5 +1,10 @@
 import torch
 from transformers import AutoImageProcessor, AutoModelForImageClassification
+try:
+    from transformers import SiglipImageProcessor
+    SIGLIP_AVAILABLE = True
+except ImportError:
+    SIGLIP_AVAILABLE = False
 from PIL import Image
 import numpy as np
 
@@ -13,13 +18,19 @@ class EnsembleDetector:
         self.model_names = []
         self.model_types = []
         
-        # Load Model 1: Primary HuggingFace model
+        # Load Model 1: Primary HuggingFace model (Siglip architecture)
         try:
             cache_dir = "./models_cache/huggingface"
-            processor1 = AutoImageProcessor.from_pretrained(
-                "prithivMLmods/Deep-Fake-Detector-Model",
-                cache_dir=cache_dir
-            )
+            if SIGLIP_AVAILABLE:
+                processor1 = SiglipImageProcessor.from_pretrained(
+                    "prithivMLmods/Deep-Fake-Detector-Model",
+                    cache_dir=cache_dir
+                )
+            else:
+                processor1 = AutoImageProcessor.from_pretrained(
+                    "prithivMLmods/Deep-Fake-Detector-Model",
+                    cache_dir=cache_dir
+                )
             model1 = AutoModelForImageClassification.from_pretrained(
                 "prithivMLmods/Deep-Fake-Detector-Model",
                 cache_dir=cache_dir
@@ -30,7 +41,7 @@ class EnsembleDetector:
             self.processors.append(processor1)
             self.model_names.append("Primary-DeepFake-Detector")
             self.model_types.append("huggingface")
-            print("✓ Loaded Primary DeepFake Detector")
+            print("✓ Loaded Primary DeepFake Detector (Siglip)")
         except Exception as e:
             print(f"✗ Failed to load primary model: {e}")
         
