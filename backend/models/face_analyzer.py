@@ -36,10 +36,13 @@ try:
         print(f"✓ MediaPipe {MEDIAPIPE_VERSION} with Tasks API loaded")
     except Exception as e:
         print(f"✗ MediaPipe Tasks API import failed: {e}")
+        print(f"  This is often caused by WASM/memory issues in the Python environment")
+        print(f"  Falling back to OpenCV DNN (reduced facial analysis accuracy)")
         MEDIAPIPE_AVAILABLE = False
         
 except ImportError as e:
     print(f"✗ MediaPipe not available: {e}")
+    print(f"  Install with: pip install mediapipe")
 
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), '..', 'models_cache')
@@ -104,6 +107,11 @@ class FaceAnalyzer:
                     
                 except Exception as e:
                     print(f"✗ MediaPipe initialization failed: {e}")
+                    print(f"  Common causes:")
+                    print(f"  - WASM initialization failure (try upgrading mediapipe)")
+                    print(f"  - Model file corrupted (delete face_landmarker.task and retry)")
+                    print(f"  - Memory constraints (restart Python environment)")
+                    print(f"  Facial analysis will use basic OpenCV detection (less accurate)")
                     self._init_opencv()
             else:
                 self._init_opencv()
@@ -348,15 +356,50 @@ class FaceAnalyzer:
         try:
             h, w = image.shape[:2]
             
+            # Try to find eye candidates in upper-middle region
             eye_candidates = []
             for lm in landmarks:
                 if h * 0.2 < lm[1] < h * 0.5:
                     eye_candidates.append(lm)
             
+            # If we have too few landmarks (OpenCV fallback), try to detect eyes directly
+            if len(eye_candidates) < 2 and hasattr(self, 'eye_cascade'):
+                gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+                # Focus on upper half of image for eye detection
+                upper_half = gray[:h//2, :]
+                
+                # Try multiple detection passes with different parameters
+                eyes = self.eye_cascade.detectMultiScale(upper_half, 1.1, 3, minSize=(15, 15))
+                
+                if len(eyes) < 2:
+                    # Try more aggressive detection
+                    eyes = self.eye_cascade.detectMultiScale(upper_half, 1.05, 2, minSize=(10, 10))
+                
+                for (ex, ey, ew, eh) in eyes[:2]:
+                    eye_candidates.append([ex + ew//2, ey + eh//2])
+            
+            # FALLBACK: If still no eyes, estimate positions from landmarks
+            if len(eye_candidates) < 2 and len(landmarks) > 4:
+                # Estimate eye positions from face bounding box
+                x_min, y_min = landmarks.min(axis=0)
+                x_max, y_max = landmarks.max(axis=0)
+                face_width = x_max - x_min
+                face_height = y_max - y_min
+                
+                # Typical eye positions (anthropometric proportions)
+                left_eye_x = int(x_min + face_width * 0.35)
+                right_eye_x = int(x_min + face_width * 0.65)
+                eye_y = int(y_min + face_height * 0.35)
+                
+                eye_candidates = [[left_eye_x, eye_y], [right_eye_x, eye_y]]
+            
             if len(eye_candidates) < 2:
-                return 0.5
+                # No reliable eye detection - return neutral with slight suspicion
+                return 0.55
             
             sharpness_scores = []
+            texture_scores = []
+            
             for eye_point in eye_candidates[:2]:
                 x, y = eye_point
                 x1, y1 = max(0, x-25), max(0, y-25)
@@ -364,16 +407,33 @@ class FaceAnalyzer:
                 eye_region = image[y1:y2, x1:x2]
                 
                 if eye_region.size > 0:
+                    # Measure sharpness (deepfakes often blur eyes)
                     sharpness = self._calculate_sharpness(eye_region)
                     sharpness_scores.append(sharpness)
+                    
+                    # Measure texture variance (AI eyes lack micro-details)
+                    if len(eye_region.shape) == 3:
+                        gray_eye = cv2.cvtColor(eye_region, cv2.COLOR_RGB2GRAY)
+                    else:
+                        gray_eye = eye_region
+                    texture_var = np.var(gray_eye)
+                    texture_scores.append(texture_var)
             
-            if sharpness_scores:
+            if sharpness_scores and texture_scores:
                 avg_sharpness = np.mean(sharpness_scores)
-                score = 1.0 - min(avg_sharpness / 100.0, 1.0)
-                return float(score)
-            return 0.5
-        except:
-            return 0.5
+                avg_texture = np.mean(texture_scores)
+                
+                # Combine: low sharpness OR low texture variance = suspicious
+                sharpness_score = 1.0 - min(avg_sharpness / 100.0, 1.0)
+                texture_score = 1.0 - min(avg_texture / 500.0, 1.0)
+                
+                # Weight them equally
+                combined_score = (sharpness_score * 0.5) + (texture_score * 0.5)
+                return float(combined_score)
+            
+            return 0.55
+        except Exception as e:
+            return 0.55
     
     def _calculate_sharpness(self, image_region):
         """Calculate sharpness"""

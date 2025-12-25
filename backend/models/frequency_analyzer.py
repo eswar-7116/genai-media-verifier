@@ -28,8 +28,8 @@ def analyze_frequency_domain(image):
         dct_score = compute_dct_score(image)
         high_freq_score = detect_high_frequency_anomalies(image)
         
-        # Combine scores
-        final_score = (fft_score * 0.4) + (dct_score * 0.4) + (high_freq_score * 0.2)
+        # Combine scores (boosted high_freq weight - it's most reliable)
+        final_score = (fft_score * 0.35) + (dct_score * 0.35) + (high_freq_score * 0.30)
         
         return {
             'score': float(final_score),
@@ -170,8 +170,9 @@ def compute_dct_score(image):
     total_energy = np.sum(np.abs(dct_coeffs))
     high_freq_ratio = high_freq_energy / (total_energy + 1e-10)
     
-    # Fake images often have abnormal high-frequency DCT patterns
-    score = min(high_freq_ratio * 5.0, 1.0)
+    # FIXED: Deepfakes have LESS high-frequency DCT energy (they're smoother)
+    # Low high-freq ratio = suspicious (inverted from before)
+    score = 1.0 - min(high_freq_ratio * 5.0, 1.0)
     
     return score
 

@@ -82,9 +82,10 @@ def analyze_exif_data(image_path):
         
         # ENHANCED SCORING LOGIC
         
-        # Complete absence of EXIF = very suspicious
+        # Complete absence of EXIF = moderately suspicious
+        # (Many legitimate images have no EXIF: screenshots, social media, web images)
         if len(exif_data) == 0:
-            suspicious_score = 0.85
+            suspicious_score = 0.60
         
         # No camera info = likely AI or heavily edited
         elif 'camera_make' not in exif_data and 'camera_model' not in exif_data:
@@ -106,7 +107,7 @@ def analyze_exif_data(image_path):
                 else:
                     suspicious_score = 0.65  # Medium-high - unknown software
             else:
-                suspicious_score = 0.75  # High - no camera, no software info
+                suspicious_score = 0.65  # Medium-high - no camera, no software info (reduced from 0.75)
         
         # Has camera info - check plausibility
         elif 'camera_make' in exif_data or 'camera_model' in exif_data:
@@ -129,8 +130,8 @@ def analyze_exif_data(image_path):
         return float(suspicious_score), exif_data
     
     except Exception as e:
-        # No EXIF or corrupted
-        return 0.75, {}
+        # No EXIF or corrupted - reduced from 0.75 to 0.60 (more realistic for web images)
+        return 0.60, {}
 
 
 def perform_ela_analysis(image_path):
