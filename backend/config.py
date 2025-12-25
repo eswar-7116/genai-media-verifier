@@ -1,17 +1,17 @@
 # Configuration for Deepfake Detection System
 
-# Ensemble weights for combining different detection methods
+# Base ensemble weights (will be dynamically adjusted)
 ENSEMBLE_WEIGHTS = {
-    'neural': 0.40,
-    'frequency': 0.30,
-    'face': 0.20,
-    'metadata': 0.10
+    'neural': 0.50,      # Increased from 0.40 - Neural networks are most reliable
+    'frequency': 0.25,   # Decreased from 0.30 - Can be unreliable for some fakes
+    'face': 0.15,        # Decreased from 0.20 - Only useful when face detected
+    'metadata': 0.10     # Kept same - Supporting evidence
 }
 
 # Risk level thresholds
 RISK_THRESHOLDS = {
-    'high': 0.70,
-    'medium': 0.40
+    'high': 0.65,    # Lowered from 0.70 - More sensitive detection
+    'medium': 0.40   # Kept same
 }
 
 # Model configuration
@@ -30,6 +30,12 @@ FREQUENCY_ANALYSIS_ENABLED = True
 FACE_ANALYSIS_ENABLED = True
 METADATA_ANALYSIS_ENABLED = True
 NEURAL_ENSEMBLE_ENABLED = True
+
+# Dynamic weighting settings
+ENABLE_DYNAMIC_WEIGHTING = True
+NEURAL_CONFIDENCE_BOOST = 1.5  # Boost neural weight when confidence > 90%
+AGREEMENT_BOOST = 1.3          # Boost when multiple methods agree
+FACE_NOT_DETECTED_REDISTRIBUTE = True  # Give face weight to neural when no face
 
 # MediaPipe face detection confidence
 FACE_DETECTION_CONFIDENCE = 0.5
