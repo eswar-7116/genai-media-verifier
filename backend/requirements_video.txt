@@ -1,0 +1,32 @@
+# Required packages for video deepfake detection
+
+# Existing packages (already in requirements.txt)
+# opencv-python
+# numpy
+# pillow
+# torch
+# torchvision
+# transformers
+
+# Additional packages needed for LAYER 1 & 2
+
+# Scene detection
+scenedetect[opencv]==0.6.2
+
+# Face detection and tracking
+facenet-pytorch==2.5.3
+mediapipe==0.10.8
+
+# Audio analysis
+librosa==0.10.1
+soundfile==0.12.1
+
+# Signal processing
+scipy==1.11.4
+
+# Video metadata
+# ffmpeg-python (alternative, but we use subprocess with ffmpeg directly)
+
+# Depth estimation (MiDaS)
+# timm (for MiDaS model)
+timm==0.9.12

@@ -40,7 +40,8 @@ async def root():
             "health": "/health",
             "quick_image_analysis": "/analyze/image",
             "comprehensive_image_analysis": "/analyze/image/comprehensive",
-            "video_analysis": "/analyze/video"
+            "simple_video_analysis": "/analyze/video",
+            "comprehensive_video_analysis": "/analyze/video/comprehensive"
         }
     }
 
@@ -168,8 +169,8 @@ async def analyze_image_comprehensive_endpoint(file: UploadFile = File(...)):
 @app.post("/analyze/video")
 async def analyze_video_endpoint(file: UploadFile = File(...)):
     """
-    Video analysis endpoint.
-    Extracts frames and analyzes each frame.
+    OLD Simple video analysis (frame-by-frame only).
+    Use /analyze/video/comprehensive for full hybrid detection.
     """
     try:
         validate_file(file, config.ALLOWED_VIDEO_EXTENSIONS)
@@ -198,6 +199,166 @@ async def analyze_video_endpoint(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Video analysis failed: {str(e)}")
 
 
+@app.post("/analyze/video/comprehensive")
+async def analyze_video_comprehensive_endpoint(file: UploadFile = File(...)):
+    """
+    Comprehensive HYBRID video deepfake detection:
+    
+    LAYER 1 - Pre-Analysis:
+    - Metadata forensics (encoding, frame rate, resolution)
+    - Audio presence check
+    
+    LAYER 2 - Multi-Modal Analysis:
+    A. VISUAL STREAM (Hybrid):
+       - Smart frame extraction (scene detection, faces, boundaries)
+       - Frame-based ensemble analysis
+       - Temporal consistency (landmark tracking, identity persistence)
+       - 3D video model analysis (VideoMAE)
+    
+    B. AUDIO STREAM (if present):
+       - Voice deepfake detection
+       - Lip-sync analysis
+       - Audio consistency checks
+    
+    C. PHYSIOLOGICAL SIGNALS:
+       - Heartbeat detection (rPPG)
+       - Blink pattern analysis
+       - Breathing detection
+    
+    D. PHYSICS & CONSISTENCY:
+       - Lighting consistency
+       - Depth estimation (MiDaS)
+       - Shadow analysis
+    
+    Returns detailed multi-modal analysis with high confidence scoring.
+    """
+    try:
+        validate_file(file, config.ALLOWED_VIDEO_EXTENSIONS)
+        
+        video_path = os.path.join(UPLOAD_DIR, file.filename)
+        
+        # Save uploaded file
+        with open(video_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        # Import comprehensive detector
+        from models.video.comprehensive_detector import analyze_video_comprehensive
+        
+        # Run full hybrid analysis
+        print(f"\nAnalyzing video: {file.filename}")
+        results = analyze_video_comprehensive(video_path)
+        
+        # Cleanup uploaded file and temp frames
+        try:
+            os.remove(video_path)
+        except:
+            pass
+        
+        try:
+            import shutil as sh
+            if os.path.exists("temp_frames"):
+                sh.rmtree("temp_frames")
+        except:
+            pass
+        
+        # Check for errors
+        if 'error' in results:
+            raise HTTPException(status_code=500, detail=results['error'])
+        
+        # Build response
+        response = {
+            "final_score": round(results['final_score'], 3),
+            "risk_level": results['risk_level'],
+            "confidence": round(results.get('confidence', 0.0), 3),
+            "analysis_type": "comprehensive_hybrid",
+            "method_breakdown": results.get('method_breakdown', {})
+        }
+        
+        # Add layer summaries
+        response["layer_summaries"] = {}
+        
+        # Layer 1: Metadata
+        if results.get('layer1_metadata'):
+            meta = results['layer1_metadata']
+            response["layer_summaries"]["metadata"] = {
+                "score": round(meta.get('score', 0), 3),
+                "has_audio": meta.get('has_audio', False),
+                "suspicious_indicators": meta.get('suspicious_indicators', [])
+            }
+        
+        # Layer 2A: Visual
+        response["layer_summaries"]["visual"] = {}
+        
+        if results.get('layer2a_frame_based'):
+            frame = results['layer2a_frame_based']
+            response["layer_summaries"]["visual"]["frame_based"] = {
+                "ensemble_avg": round(frame.get('avg_ensemble', 0), 3),
+                "ensemble_max": round(frame.get('max_ensemble', 0), 3),
+                "face_avg": round(frame.get('avg_face', 0), 3),
+                "frequency_avg": round(frame.get('avg_frequency', 0), 3)
+            }
+        
+        if results.get('layer2a_temporal'):
+            temp = results['layer2a_temporal']
+            response["layer_summaries"]["visual"]["temporal"] = {
+                "score": round(temp.get('score', 0), 3),
+                "identity_shifts": temp.get('identity_shifts', 0),
+                "motion_smoothness": round(temp.get('motion_smoothness', 0), 3),
+                "anomalies": temp.get('inconsistencies', [])
+            }
+        
+        if results.get('layer2a_3d_video'):
+            video3d = results['layer2a_3d_video']
+            response["layer_summaries"]["visual"]["3d_model"] = {
+                "score": round(video3d.get('score', 0), 3),
+                "method": video3d.get('method', 'unknown')
+            }
+        
+        # Layer 2B: Audio
+        if results.get('layer2b_audio'):
+            audio = results['layer2b_audio']
+            if audio.get('has_audio'):
+                response["layer_summaries"]["audio"] = {
+                    "score": round(audio.get('score', 0), 3),
+                    "voice_deepfake": round(audio.get('voice_deepfake_score', 0), 3),
+                    "lip_sync": round(audio.get('lip_sync_score', 0), 3),
+                    "anomalies": audio.get('anomalies', [])
+                }
+            else:
+                response["layer_summaries"]["audio"] = {"present": False}
+        
+        # Layer 2C: Physiological
+        if results.get('layer2c_physiological'):
+            physio = results['layer2c_physiological']
+            response["layer_summaries"]["physiological"] = {
+                "score": round(physio.get('score', 0), 3),
+                "heartbeat_detected": physio.get('heartbeat_detected', False),
+                "heartbeat_bpm": physio.get('heartbeat_bpm', 0),
+                "natural_blink_pattern": physio.get('blink_pattern_natural', False),
+                "blink_count": physio.get('blink_count', 0),
+                "anomalies": physio.get('anomalies', [])
+            }
+        
+        # Layer 2D: Physics
+        if results.get('layer2d_physics'):
+            physics = results['layer2d_physics']
+            response["layer_summaries"]["physics"] = {
+                "score": round(physics.get('score', 0), 3),
+                "lighting_consistent": physics.get('lighting_consistent', True),
+                "depth_plausible": physics.get('depth_plausible', True),
+                "anomalies": physics.get('anomalies', [])
+            }
+        
+        return response
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Comprehensive video analysis failed: {str(e)}")
+
+
 @app.on_event("startup")
 async def startup_event():
     """Initialize models on startup"""
@@ -208,6 +369,7 @@ async def startup_event():
     print(f"  - Frequency Analysis: {config.FREQUENCY_ANALYSIS_ENABLED}")
     print(f"  - Face Analysis: {config.FACE_ANALYSIS_ENABLED}")
     print(f"  - Metadata Analysis: {config.METADATA_ANALYSIS_ENABLED}")
+    print(f"  - Hybrid Video Detection: Available (Layer 1 + 2)")
     
     # Preload models
     if config.NEURAL_ENSEMBLE_ENABLED:
@@ -218,7 +380,15 @@ async def startup_event():
         from models.face_analyzer import get_face_analyzer
         get_face_analyzer()
     
-    print("System ready!")
+    print("\nVideo Detection Capabilities:")
+    print("  - Smart frame extraction")
+    print("  - Temporal consistency analysis")
+    print("  - 3D video models (VideoMAE)")
+    print("  - Audio deepfake detection")
+    print("  - Physiological signals (heartbeat, blinks)")
+    print("  - Physics consistency checks")
+    
+    print("\nSystem ready!")
 
 
 if __name__ == "__main__":
