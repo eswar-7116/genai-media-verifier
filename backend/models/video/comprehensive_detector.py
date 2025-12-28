@@ -6,6 +6,26 @@ import os
 from PIL import Image
 import numpy as np
 
+
+def convert_numpy_types(obj):
+    """
+    Recursively convert numpy types to Python native types for JSON serialization
+    """
+    if isinstance(obj, dict):
+        return {key: convert_numpy_types(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_numpy_types(item) for item in obj]
+    elif isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.bool_):
+        return bool(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    else:
+        return obj
+
 # Layer 1
 from models.video.metadata_analyzer import analyze_video_metadata
 from models.video.frame_extractor import smart_frame_extraction
@@ -257,6 +277,9 @@ def analyze_video_comprehensive(video_path, output_dir="temp_frames"):
         
         print(f"\n{'='*60}\n")
         
+        # Convert all numpy types to Python native types for JSON serialization
+        results = convert_numpy_types(results)
+        
         return results
         
     except Exception as e:
@@ -446,6 +469,9 @@ def intelligent_fusion(results):
     high_score_count = sum(1 for s in scores if s > 0.6)
     if high_score_count >= 3:
         final_score = min(final_score * 1.2, 1.0)
+    
+    # Convert breakdown to ensure all values are Python native types
+    breakdown = convert_numpy_types(breakdown)
     
     return float(final_score), float(avg_confidence), breakdown
 
