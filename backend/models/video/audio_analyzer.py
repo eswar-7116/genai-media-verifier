@@ -9,6 +9,13 @@ import subprocess
 import os
 import tempfile
 
+# Read FFmpeg path from environment variable (same as video_utils.py)
+FFMPEG_PATH = os.getenv("FFMPEG_PATH", "ffmpeg")
+FFPROBE_PATH = FFMPEG_PATH.replace("ffmpeg", "ffprobe") if "ffmpeg" in FFMPEG_PATH else "ffprobe"
+
+# Path to local cascade files
+MODELS_CACHE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'models_cache')
+
 
 def analyze_audio_stream(video_path):
     """
@@ -49,8 +56,12 @@ def analyze_audio_stream(video_path):
         if not audio_path:
             return {
                 'has_audio': True,
-                'score': 0.5,
-                'error': 'Could not extract audio'
+                'score': 0.0,  # Neutral score when audio can't be extracted
+                'voice_deepfake_score': 0.0,
+                'lip_sync_score': 0.0,
+                'audio_consistency': 0.0,
+                'message': 'FFmpeg not found - audio analysis skipped. Install FFmpeg for audio analysis.',
+                'anomalies': ['Audio extraction failed - FFmpeg required']
             }
         
         # 1. Voice Deepfake Detection
@@ -99,11 +110,31 @@ def analyze_audio_stream(video_path):
 def check_audio_presence(video_path):
     """Check if video has audio track"""
     try:
-        ffmpeg_path = os.getenv("FFMPEG_PATH", "ffmpeg")
-        ffprobe_path = ffmpeg_path.replace("ffmpeg", "ffprobe")
+        # Try using OpenCV first (more reliable, no external dependencies)
+        cap = cv2.VideoCapture(video_path)
         
+        # Get audio codec info
+        fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))
+        has_audio = cap.get(cv2.CAP_PROP_AUDIO_STREAM) >= 0
+        
+        cap.release()
+        
+        # If OpenCV doesn't support audio detection, try ffprobe
+        if not has_audio:
+            has_audio = check_audio_with_ffprobe(video_path)
+        
+        return has_audio
+        
+    except Exception as e:
+        # Fallback: try ffprobe
+        return check_audio_with_ffprobe(video_path)
+
+
+def check_audio_with_ffprobe(video_path):
+    """Check audio using ffprobe (fallback method)"""
+    try:
         cmd = [
-            ffprobe_path,
+            FFPROBE_PATH,
             '-v', 'error',
             '-select_streams', 'a:0',
             '-show_entries', 'stream=codec_type',
@@ -111,7 +142,14 @@ def check_audio_presence(video_path):
             video_path
         ]
         
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+        result = subprocess.run(
+            cmd, 
+            capture_output=True, 
+            text=True, 
+            timeout=10, 
+            check=False,
+            shell=True  # Use shell to resolve PATH (same as metadata_analyzer.py)
+        )
         return 'audio' in result.stdout.lower()
         
     except Exception as e:
@@ -122,32 +160,47 @@ def check_audio_presence(video_path):
 def extract_audio(video_path):
     """Extract audio from video"""
     try:
-        ffmpeg_path = os.getenv("FFMPEG_PATH", "ffmpeg")
-        
         # Create temp audio file
         temp_audio = tempfile.NamedTemporaryFile(suffix='.wav', delete=False)
         audio_path = temp_audio.name
         temp_audio.close()
         
         cmd = [
-            ffmpeg_path,
+            FFMPEG_PATH,
             '-i', video_path,
             '-vn',  # No video
             '-acodec', 'pcm_s16le',  # PCM audio
             '-ar', '16000',  # Sample rate
             '-ac', '1',  # Mono
+            '-y',  # Overwrite
             audio_path
         ]
         
-        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60, check=True)
+        result = subprocess.run(
+            cmd, 
+            stdout=subprocess.DEVNULL, 
+            stderr=subprocess.DEVNULL, 
+            timeout=60,
+            check=False,
+            shell=True  # Use shell to resolve PATH (same as metadata_analyzer.py)
+        )
         
-        if os.path.exists(audio_path) and os.path.getsize(audio_path) > 0:
+        if result.returncode == 0 and os.path.exists(audio_path) and os.path.getsize(audio_path) > 0:
             return audio_path
+        
+        # Clean up if extraction failed
+        if os.path.exists(audio_path):
+            os.remove(audio_path)
         
         return None
         
     except Exception as e:
         print(f"Audio extraction error: {e}")
+        if 'audio_path' in locals() and os.path.exists(audio_path):
+            try:
+                os.remove(audio_path)
+            except:
+                pass
         return None
 
 
@@ -237,7 +290,7 @@ def analyze_lip_sync(video_path, audio_path):
         # Extract mouth movement from video
         mouth_movements = extract_mouth_movements(video_path)
         
-        if not mouth_movements:
+        if mouth_movements is None or len(mouth_movements) == 0:
             return {'score': 0.0, 'reason': 'Could not track mouth'}
         
         # Resample to match lengths
@@ -297,15 +350,28 @@ def extract_mouth_movements(video_path):
 def extract_mouth_movements_opencv(video_path):
     """Extract mouth movements using OpenCV"""
     try:
-        face_cascade = cv2.CascadeClassifier(
-            cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
-        )
-        mouth_cascade = cv2.CascadeClassifier(
-            cv2.data.haarcascades + 'haarcascade_mcs_mouth.xml'
-        )
+        # Load face cascade
+        face_cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+        if not os.path.exists(face_cascade_path):
+            print("Face cascade file not found")
+            return extract_mouth_movements_simple(video_path)
+        
+        face_cascade = cv2.CascadeClassifier(face_cascade_path)
+        
+        # Try to load mouth cascade from local cache first, then OpenCV
+        mouth_cascade_path = os.path.join(MODELS_CACHE_DIR, 'haarcascade_mcs_mouth.xml')
+        if not os.path.exists(mouth_cascade_path):
+            mouth_cascade_path = cv2.data.haarcascades + 'haarcascade_mcs_mouth.xml'
+        
+        use_mouth_cascade = os.path.exists(mouth_cascade_path)
+        
+        if use_mouth_cascade:
+            mouth_cascade = cv2.CascadeClassifier(mouth_cascade_path)
+            # Verify cascade loaded successfully
+            if mouth_cascade.empty():
+                use_mouth_cascade = False
         
         cap = cv2.VideoCapture(video_path)
-        
         mouth_openness = []
         
         while True:
@@ -322,30 +388,76 @@ def extract_mouth_movements_opencv(video_path):
                 # Use largest face
                 x, y, w, h = max(faces, key=lambda f: f[2] * f[3])
                 
-                # Look for mouth in lower half of face
-                face_roi = gray[y+h//2:y+h, x:x+w]
-                
-                # Detect mouth
-                mouths = mouth_cascade.detectMultiScale(face_roi, 1.3, 5, minSize=(30, 20))
-                
-                if len(mouths) > 0:
-                    # Use largest mouth detection
-                    mx, my, mw, mh = max(mouths, key=lambda m: m[2] * m[3])
-                    # Height of mouth region as proxy for openness
-                    openness = mh / h  # Normalize by face height
-                    mouth_openness.append(openness)
+                if use_mouth_cascade:
+                    # Look for mouth in lower half of face
+                    face_roi = gray[y+h//2:y+h, x:x+w]
+                    
+                    # Detect mouth
+                    mouths = mouth_cascade.detectMultiScale(face_roi, 1.3, 5, minSize=(30, 20))
+                    
+                    if len(mouths) > 0:
+                        # Use largest mouth detection
+                        mx, my, mw, mh = max(mouths, key=lambda m: m[2] * m[3])
+                        openness = mh / h  # Normalize by face height
+                        mouth_openness.append(openness)
+                    else:
+                        mouth_openness.append(0)
                 else:
-                    mouth_openness.append(0)
+                    # Fallback: estimate mouth movement from lower face region variance
+                    mouth_roi = gray[y+int(h*0.6):y+h, x+int(w*0.25):x+int(w*0.75)]
+                    if mouth_roi.size > 0:
+                        # Use intensity variance as proxy for mouth movement
+                        variance = np.var(mouth_roi)
+                        mouth_openness.append(float(variance) / 1000.0)  # Normalize
+                    else:
+                        mouth_openness.append(0)
             else:
                 mouth_openness.append(0)
         
         cap.release()
         
-        return np.array(mouth_openness)
+        if len(mouth_openness) > 0:
+            return np.array(mouth_openness)
+        else:
+            return extract_mouth_movements_simple(video_path)
         
     except Exception as e:
         print(f"OpenCV mouth movement extraction error: {e}")
-        return []
+        return extract_mouth_movements_simple(video_path)
+
+
+def extract_mouth_movements_simple(video_path):
+    """Simple fallback: use face region intensity changes as proxy for mouth movement"""
+    try:
+        cap = cv2.VideoCapture(video_path)
+        movements = []
+        prev_frame = None
+        
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            
+            # Use center-bottom region as likely mouth area
+            h, w = gray.shape
+            mouth_region = gray[int(h*0.5):int(h*0.8), int(w*0.3):int(w*0.7)]
+            
+            if prev_frame is not None:
+                # Calculate frame difference in mouth region
+                diff = cv2.absdiff(prev_frame, mouth_region)
+                movement = np.mean(diff)
+                movements.append(movement)
+            
+            prev_frame = mouth_region.copy()
+        
+        cap.release()
+        return np.array(movements) if movements else np.array([])
+        
+    except Exception as e:
+        print(f"Simple mouth movement extraction error: {e}")
+        return np.array([])
 
 
 
