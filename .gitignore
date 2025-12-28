@@ -1,42 +1,51 @@
-# Python cache
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.Python
+*.pyc
+venv/
+env/
+ENV/
 
-# Model cache and downloads
+# Model cache - NEVER commit these
+backend/models_cache/
 models_cache/
 *.caffemodel
 *.task
-*.prototxt
 *.pth
 *.h5
 *.onnx
 *.pb
+*.safetensors
+*.bin
 
 # HuggingFace cache
 huggingface/
+.cache/
 
 # User uploads
+backend/uploads/
 uploads/
 *.mp4
 *.avi
 *.mov
 *.mkv
 
-# Environment
-.env
-.venv
-env/
-venv/
-ENV/
-
 # IDE
 .vscode/
 .idea/
-*.swp
-*.swo
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Test files
+*.log
+
+test_data/
