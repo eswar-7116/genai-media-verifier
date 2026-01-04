@@ -3,6 +3,7 @@ from services.report_generator import generate_report, generate_comprehensive_re
 from services.comprehensive_analyzer import analyze_image_comprehensive
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import shutil
 
@@ -12,6 +13,15 @@ import config
 
 
 app = FastAPI(title="Deepfake Detection API", version="2.0")
+
+# Enable CORS for frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify exact origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)

@@ -49,3 +49,24 @@ Thumbs.db
 *.log
 
 test_data/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Lock files (we use npm, ignore others)
+pnpm-lock.yaml
+yarn.lock
+
+# Testing
+/coverage
+
+# Misc
+*.pem
