@@ -11,11 +11,23 @@ export default function RiskGauge({ manipulationScore, riskLevel, gaugeType = 'r
   
   const getRiskConfig = () => {
     if (gaugeType === 'confidence') {
+      // Confidence levels
+      let confidenceLevel = 'Low Confidence'
+      let color = '#ef4444' // red
+      
+      if (manipulationScore >= 0.7) {
+        confidenceLevel = 'High Confidence'
+        color = '#10b981' // green
+      } else if (manipulationScore >= 0.4) {
+        confidenceLevel = 'Medium Confidence'
+        color = '#f59e0b' // yellow
+      }
+      
       return {
-        label: 'MODEL CERTAINTY',
-        color: 'text-cyan-400',
-        gaugeColor: '#00f3ff',
-        glowColor: 'rgba(0, 243, 255, 0.3)'
+        label: confidenceLevel.toUpperCase(),
+        color: `text-[${color}]`,
+        gaugeColor: color,
+        glowColor: `${color}4D` // 30% opacity
       }
     }
     
@@ -78,7 +90,10 @@ export default function RiskGauge({ manipulationScore, riskLevel, gaugeType = 'r
         {/* Center text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <div className={`text-7xl font-light tracking-wider ${config.color} mb-2`}
-               style={{ textShadow: `0 0 20px ${config.glowColor}` }}>
+               style={{ 
+                 textShadow: `0 0 20px ${config.glowColor}`,
+                 color: config.gaugeColor
+               }}>
             {percentage}
           </div>
           <div className="text-xs text-white/40 tracking-[3px] uppercase">
@@ -89,7 +104,8 @@ export default function RiskGauge({ manipulationScore, riskLevel, gaugeType = 'r
 
       {/* Label */}
       <div className="text-center">
-        <div className={`text-lg font-light tracking-[3px] uppercase ${config.color}`}>
+        <div className={`text-lg font-light tracking-[3px] uppercase ${config.color}`}
+             style={{ color: config.gaugeColor }}>
           {config.label}
         </div>
       </div>

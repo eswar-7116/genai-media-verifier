@@ -6,7 +6,6 @@ import RiskGauge from './risk-gauge'
 import SignalsOverview from './signals-overview'
 import KeyIndicators from './key-indicators'
 import TechnicalAnalysis from './technical-analysis'
-import FullReport from './full-report'
 import { useState } from 'react'
 
 interface ResultsDashboardProps {
@@ -63,7 +62,7 @@ export default function ResultsDashboard({
         >
           {/* Risk Gauge */}
           <div className="flex justify-center">
-            <div className="glass-card border-white/10 rounded-3xl p-8 w-full">
+            <div className="bg-[#1a1a1a] border border-white/10 rounded-3xl p-8 w-full">
               <RiskGauge 
                 manipulationScore={finalScore}
                 riskLevel={riskLevel}
@@ -74,7 +73,7 @@ export default function ResultsDashboard({
 
           {/* Confidence Gauge */}
           <div className="flex justify-center">
-            <div className="glass-card border-white/10 rounded-3xl p-8 w-full">
+            <div className="bg-[#1a1a1a] border border-white/10 rounded-3xl p-8 w-full">
               <RiskGauge 
                 manipulationScore={confidence}
                 riskLevel="confidence"
@@ -85,7 +84,7 @@ export default function ResultsDashboard({
 
           {/* Key Indicators */}
           <div className="flex items-center">
-            <div className="glass-card border-white/10 rounded-3xl p-8 w-full">
+            <div className="bg-[#1a1a1a] border border-white/10 rounded-3xl p-8 w-full">
               <KeyIndicators 
                 results={results}
                 fileType={fileType}
@@ -94,19 +93,17 @@ export default function ResultsDashboard({
           </div>
         </div>
 
-        {/* Signals Overview - Full viewport height section */}
+        {/* Signals Overview */}
         <div 
-          className="animate-fade-in-up opacity-0 min-h-screen flex items-center py-20"
+          className="animate-fade-in-up opacity-0"
           style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}
         >
-          <div className="w-full">
-            <SignalsOverview 
-              results={results}
-              fileType={fileType}
-              onChartHover={setHoveredChart}
-              hoveredChart={hoveredChart}
-            />
-          </div>
+          <SignalsOverview 
+            results={results}
+            fileType={fileType}
+            onChartHover={setHoveredChart}
+            hoveredChart={hoveredChart}
+          />
         </div>
 
         {/* Technical Analysis */}
@@ -114,7 +111,7 @@ export default function ResultsDashboard({
           className="animate-fade-in-up opacity-0"
           style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}
         >
-          <div className="glass-card border-white/10 rounded-3xl p-8">
+          <div className="bg-[#1a1a1a] border border-white/10 rounded-3xl p-8">
             <TechnicalAnalysis 
               results={results}
               fileType={fileType}
@@ -122,19 +119,27 @@ export default function ResultsDashboard({
           </div>
         </div>
 
-        {/* Full Report */}
+        {/* Disclaimer */}
         <div 
           className="animate-fade-in-up opacity-0"
           style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}
         >
-          <div className="glass-card border-white/10 rounded-3xl p-8">
-            <FullReport report={results.report} />
+          <div className="bg-[#1a1a1a] border border-white/10 rounded-3xl p-8">
+            <div className="space-y-4">
+              <h3 className="text-xl font-light tracking-[3px] uppercase text-white/90">Important Notice</h3>
+              <p className="text-sm text-white/60 leading-relaxed">
+                This assessment is probabilistic in nature and should not be considered definitive proof of authenticity or manipulation. 
+                The multi-method approach increases detection accuracy but cannot guarantee perfect results. The findings are intended to 
+                support journalistic and legal workflows and should be used alongside contextual analysis, source verification, chain of 
+                custody validation, and human expert judgment.
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Actions */}
         <div 
-          className="flex items-center justify-center gap-6 pt-8 border-t border-white/10 animate-fade-in-up opacity-0"
+          className="flex items-center justify-center gap-6 pt-8 animate-fade-in-up opacity-0"
           style={{ animationDelay: '1s', animationFillMode: 'forwards' }}
         >
           <button

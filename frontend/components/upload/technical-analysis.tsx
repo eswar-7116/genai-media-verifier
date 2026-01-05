@@ -28,10 +28,16 @@ export default function TechnicalAnalysis({ results, fileType }: TechnicalAnalys
     if (layerSummaries.metadata) tabs.push({ id: 'metadata', label: 'Metadata' })
   }
 
-  const renderMetric = (label: string, value: number | string, suffix = '') => {
-    const displayValue = typeof value === 'number' 
-      ? `${Math.round(value * 100)}${suffix}`
-      : value
+  const renderMetric = (label: string, value: number | string | boolean, suffix = '') => {
+    let displayValue: string
+    
+    if (typeof value === 'boolean') {
+      displayValue = value ? 'Yes' : 'No'
+    } else if (typeof value === 'number') {
+      displayValue = `${Math.round(value * 100)}${suffix}`
+    } else {
+      displayValue = value
+    }
     
     return (
       <div className="flex justify-between items-center py-3 border-b border-white/10 last:border-0">
@@ -49,7 +55,7 @@ export default function TechnicalAnalysis({ results, fileType }: TechnicalAnalys
       </div>
 
       <div className="border-b border-white/10">
-        <div className="flex gap-8 overflow-x-auto">
+        <div className="flex gap-8 overflow-x-auto scrollbar-hide">
           {tabs.map(tab => (
             <button
               key={tab.id}
@@ -152,6 +158,99 @@ export default function TechnicalAnalysis({ results, fileType }: TechnicalAnalys
                     {results.analysis_breakdown.neural_network.model_agreement?.replace('_', ' ')}
                   </div>
                 </div>
+              </div>
+              
+              <div className="pt-4 space-y-3">
+                <h4 className="text-sm text-white/60 uppercase tracking-wider">Model Scores</h4>
+                {results.analysis_breakdown.neural_network.model_names?.map((name: string, idx: number) => {
+                  const score = results.analysis_breakdown.neural_network.individual_scores?.[idx]
+                  const modelShortName = name.split('/')[1] || name
+                  return (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-white/50">{modelShortName}</span>
+                        <span className="text-white/70">{score ? Math.round(score * 100) : 0}%</span>
+                      </div>
+                      <div className="w-full bg-white/5 rounded-full h-1.5">
+                        <div 
+                          className="bg-cyan-400 h-1.5 rounded-full transition-all duration-500"
+                          style={{ width: `${score ? score * 100 : 0}%` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {fileType === 'image' && activeTab === 'frequency' && results.analysis_breakdown?.frequency_domain && (
+          <div className="space-y-8">
+            <p className="text-white/60 leading-relaxed text-sm">
+              Analyzes frequency domain anomalies using FFT and DCT transforms to detect manipulation artifacts.
+            </p>
+            <div className="space-y-6">
+              <div className="grid grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <div className="text-xs text-white/40 tracking-[2px] uppercase">Overall Score</div>
+                  <div className="text-4xl font-light text-cyan-400">
+                    {Math.round(results.analysis_breakdown.frequency_domain.score * 100)}%
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-xs text-white/40 tracking-[2px] uppercase">FFT Score</div>
+                  <div className="text-4xl font-light text-cyan-400">
+                    {Math.round(results.analysis_breakdown.frequency_domain.fft_score * 100)}%
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-xs text-white/40 tracking-[2px] uppercase">DCT Score</div>
+                  <div className="text-4xl font-light text-cyan-400">
+                    {Math.round(results.analysis_breakdown.frequency_domain.dct_score * 100)}%
+                  </div>
+                </div>
+              </div>
+              
+              <div className="pt-4 space-y-2">
+                {renderMetric('High Frequency Score', results.analysis_breakdown.frequency_domain.high_freq_score, '%')}
+                {renderMetric('FFT Anomaly Detected', results.analysis_breakdown.frequency_domain.fft_anomaly)}
+                {renderMetric('DCT Anomaly Detected', results.analysis_breakdown.frequency_domain.dct_anomaly)}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {fileType === 'image' && activeTab === 'facial' && results.analysis_breakdown?.facial_analysis && (
+          <div className="space-y-8">
+            <p className="text-white/60 leading-relaxed text-sm">
+              Examines facial landmarks, symmetry, skin texture, and lighting consistency using computer vision.
+            </p>
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <div className="text-xs text-white/40 tracking-[2px] uppercase">Overall Score</div>
+                  <div className="text-4xl font-light text-cyan-400">
+                    {Math.round(results.analysis_breakdown.facial_analysis.score * 100)}%
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-xs text-white/40 tracking-[2px] uppercase">Method Used</div>
+                  <div className="text-lg font-light text-white pt-2">
+                    {results.analysis_breakdown.facial_analysis.method_used || 'N/A'}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="pt-4 space-y-2">
+                {renderMetric('Face Detected', results.analysis_breakdown.facial_analysis.face_detected)}
+                {renderMetric('Symmetry Score', results.analysis_breakdown.facial_analysis.symmetry_score, '%')}
+                {renderMetric('Eye Quality Score', results.analysis_breakdown.facial_analysis.eye_quality_score, '%')}
+                {renderMetric('Skin Texture Score', results.analysis_breakdown.facial_analysis.skin_texture_score, '%')}
+                {renderMetric('Lighting Score', results.analysis_breakdown.facial_analysis.lighting_score, '%')}
+                {renderMetric('Symmetry Anomaly', results.analysis_breakdown.facial_analysis.symmetry_anomaly)}
+                {renderMetric('Eye Anomaly', results.analysis_breakdown.facial_analysis.eye_anomaly)}
+                {renderMetric('Texture Anomaly', results.analysis_breakdown.facial_analysis.texture_anomaly)}
               </div>
             </div>
           </div>
@@ -293,12 +392,24 @@ export default function TechnicalAnalysis({ results, fileType }: TechnicalAnalys
             </p>
             <div className="space-y-6">
               {fileType === 'image' && results.analysis_breakdown?.metadata_forensics && (
-                <div className="space-y-2">
-                  <div className="text-xs text-white/40 tracking-[2px] uppercase">Overall Score</div>
-                  <div className="text-4xl font-light text-cyan-400">
-                    {Math.round(results.analysis_breakdown.metadata_forensics.score * 100)}%
+                <>
+                  <div className="space-y-2">
+                    <div className="text-xs text-white/40 tracking-[2px] uppercase">Overall Score</div>
+                    <div className="text-4xl font-light text-cyan-400">
+                      {Math.round(results.analysis_breakdown.metadata_forensics.score * 100)}%
+                    </div>
                   </div>
-                </div>
+                  
+                  <div className="pt-4 space-y-2">
+                    {renderMetric('EXIF Present', results.analysis_breakdown.metadata_forensics.exif_present)}
+                    {renderMetric('EXIF Score', results.analysis_breakdown.metadata_forensics.exif_score, '%')}
+                    {renderMetric('ELA Score', results.analysis_breakdown.metadata_forensics.ela_score, '%')}
+                    {renderMetric('Compression Score', results.analysis_breakdown.metadata_forensics.compression_score, '%')}
+                    {renderMetric('Editing Software', results.analysis_breakdown.metadata_forensics.editing_software_detected || 'Unknown')}
+                    {renderMetric('EXIF Suspicious', results.analysis_breakdown.metadata_forensics.exif_suspicious)}
+                    {renderMetric('ELA Anomalies', results.analysis_breakdown.metadata_forensics.ela_anomalies)}
+                  </div>
+                </>
               )}
               {fileType === 'video' && results.layer_summaries?.metadata && (
                 <div className="space-y-2">
@@ -312,6 +423,16 @@ export default function TechnicalAnalysis({ results, fileType }: TechnicalAnalys
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   )
 }

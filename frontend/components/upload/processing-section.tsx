@@ -66,7 +66,7 @@ export default function ProcessingSection({ file, progress, uploadProgress, curr
                     <FileVideo className="w-20 h-20 text-neon-blue mx-auto" />
                   )}
                   <div className="space-y-2">
-                    <p className="text-2xl font-light text-white tracking-wide">{file?.name}</p>
+                    <p className="text-2xl font-light text-white tracking-wide break-words px-2">{file?.name}</p>
                     <p className="text-sm text-white/50 tracking-widest uppercase">
                       {file ? (file.size / 1024 / 1024).toFixed(2) : '0'} MB
                     </p>

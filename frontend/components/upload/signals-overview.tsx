@@ -54,10 +54,10 @@ function EnsembleDistributionStrip({ avgScore, maxScore, id, onHover, isHovered,
 
   return (
     <div 
-      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center ${
+      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center bg-[#1a1a1a] ${
         isHovered ? 'scale-110 z-50 border-cyan-500/50 shadow-[0_0_40px_rgba(0,243,255,0.3)] bg-white/[0.08]' 
-        : isDimmed ? 'opacity-40 scale-95 bg-white/[0.02]' 
-        : 'hover:border-cyan-500/30 hover:scale-105 bg-white/[0.02]'
+        : isDimmed ? 'opacity-40 scale-95' 
+        : 'hover:border-cyan-500/30 hover:scale-105'
       }`}
       onMouseEnter={() => onHover(id)}
       onMouseLeave={() => onHover(null)}
@@ -137,10 +137,10 @@ function IdentityTimeline({ shifts, id, onHover, isHovered, isDimmed }: { shifts
 
   return (
     <div 
-      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center ${
+      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center bg-[#1a1a1a] ${
         isHovered ? 'scale-110 z-50 border-cyan-500/50 shadow-[0_0_40px_rgba(0,243,255,0.3)] bg-white/[0.08]' 
-        : isDimmed ? 'opacity-40 scale-95 bg-white/[0.02]' 
-        : 'hover:border-cyan-500/30 hover:scale-105 bg-white/[0.02]'
+        : isDimmed ? 'opacity-40 scale-95' 
+        : 'hover:border-cyan-500/30 hover:scale-105'
       }`}
       onMouseEnter={() => onHover(id)}
       onMouseLeave={() => onHover(null)}
@@ -182,10 +182,10 @@ function CoherenceStrip({ score, id, onHover, isHovered, isDimmed }: { score: nu
 
   return (
     <div 
-      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center ${
+      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center bg-[#1a1a1a] ${
         isHovered ? 'scale-110 z-50 border-cyan-500/50 shadow-[0_0_40px_rgba(0,243,255,0.3)] bg-white/[0.08]' 
-        : isDimmed ? 'opacity-40 scale-95 bg-white/[0.02]' 
-        : 'hover:border-cyan-500/30 hover:scale-105 bg-white/[0.02]'
+        : isDimmed ? 'opacity-40 scale-95' 
+        : 'hover:border-cyan-500/30 hover:scale-105'
       }`}
       onMouseEnter={() => onHover(id)}
       onMouseLeave={() => onHover(null)}
@@ -234,10 +234,10 @@ function PhysiologicalBand({ score, blinkNatural, heartbeatDetected, id, onHover
 
   return (
     <div 
-      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center ${
+      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center bg-[#1a1a1a] ${
         isHovered ? 'scale-110 z-50 border-cyan-500/50 shadow-[0_0_40px_rgba(0,243,255,0.3)] bg-white/[0.08]' 
-        : isDimmed ? 'opacity-40 scale-95 bg-white/[0.02]' 
-        : 'hover:border-cyan-500/30 hover:scale-105 bg-white/[0.02]'
+        : isDimmed ? 'opacity-40 scale-95' 
+        : 'hover:border-cyan-500/30 hover:scale-105'
       }`}
       onMouseEnter={() => onHover(id)}
       onMouseLeave={() => onHover(null)}
@@ -301,10 +301,10 @@ function AudioWaveform({ score, id, onHover, isHovered, isDimmed }: { score: num
 
   return (
     <div 
-      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center ${
+      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center bg-[#1a1a1a] ${
         isHovered ? 'scale-110 z-50 border-cyan-500/50 shadow-[0_0_40px_rgba(0,243,255,0.3)] bg-white/[0.08]' 
-        : isDimmed ? 'opacity-40 scale-95 bg-white/[0.02]' 
-        : 'hover:border-cyan-500/30 hover:scale-105 bg-white/[0.02]'
+        : isDimmed ? 'opacity-40 scale-95' 
+        : 'hover:border-cyan-500/30 hover:scale-105'
       }`}
       onMouseEnter={() => onHover(id)}
       onMouseLeave={() => onHover(null)}
@@ -346,10 +346,10 @@ function PhysicsBand({ score, lightingConsistent, depthPlausible, id, onHover, i
 
   return (
     <div 
-      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center ${
+      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center bg-[#1a1a1a] ${
         isHovered ? 'scale-110 z-50 border-cyan-500/50 shadow-[0_0_40px_rgba(0,243,255,0.3)] bg-white/[0.08]' 
-        : isDimmed ? 'opacity-40 scale-95 bg-white/[0.02]' 
-        : 'hover:border-cyan-500/30 hover:scale-105 bg-white/[0.02]'
+        : isDimmed ? 'opacity-40 scale-95' 
+        : 'hover:border-cyan-500/30 hover:scale-105'
       }`}
       onMouseEnter={() => onHover(id)}
       onMouseLeave={() => onHover(null)}
@@ -392,10 +392,10 @@ function ImageChart({ score, title, detail, id, onHover, isHovered, isDimmed }: 
 
   return (
     <div 
-      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center ${
+      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center bg-[#1a1a1a] ${
         isHovered ? 'scale-110 z-50 border-cyan-500/50 shadow-[0_0_40px_rgba(0,243,255,0.3)] bg-white/[0.08]' 
-        : isDimmed ? 'opacity-40 scale-95 bg-white/[0.02]' 
-        : 'hover:border-cyan-500/30 hover:scale-105 bg-white/[0.02]'
+        : isDimmed ? 'opacity-40 scale-95' 
+        : 'hover:border-cyan-500/30 hover:scale-105'
       }`}
       onMouseEnter={() => onHover(id)}
       onMouseLeave={() => onHover(null)}
@@ -413,10 +413,10 @@ function ImageChart({ score, title, detail, id, onHover, isHovered, isDimmed }: 
 function MetadataCard({ score, hasAudio, suspiciousCount, id, onHover, isHovered, isDimmed }: { score: number; hasAudio: boolean; suspiciousCount: number; id: string; onHover: (id: string | null) => void; isHovered: boolean; isDimmed: boolean }) {
   return (
     <div 
-      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center ${
+      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center bg-[#1a1a1a] ${
         isHovered ? 'scale-110 z-50 border-cyan-500/50 shadow-[0_0_40px_rgba(0,243,255,0.3)] bg-white/[0.08]' 
-        : isDimmed ? 'opacity-40 scale-95 bg-white/[0.02]' 
-        : 'hover:border-cyan-500/30 hover:scale-105 bg-white/[0.02]'
+        : isDimmed ? 'opacity-40 scale-95' 
+        : 'hover:border-cyan-500/30 hover:scale-105'
       }`}
       onMouseEnter={() => onHover(id)}
       onMouseLeave={() => onHover(null)}
@@ -489,7 +489,7 @@ export default function SignalsOverview({ results, fileType, onChartHover, hover
     if (signals.length === 0) return <div className="text-center py-8 text-white/50">No analysis signals available</div>
 
     return (
-      <div className="space-y-8">
+      <div className="space-y-8 bg-[#0f0f0f] rounded-3xl p-8 border border-white/10">
         <div>
           <h2 className="text-3xl font-light tracking-[4px] uppercase text-white">Signals Overview</h2>
           <p className="text-white/50 mt-2 tracking-wide">Analysis methods applied to this media</p>
@@ -533,7 +533,7 @@ export default function SignalsOverview({ results, fileType, onChartHover, hover
   if (cards.length === 0) return <div className="text-center py-8 text-white/50">No analysis signals available</div>
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 bg-[#0f0f0f] rounded-3xl p-8 border border-white/10">
       <div>
         <h2 className="text-3xl font-light tracking-[4px] uppercase text-white">Signals Overview</h2>
         <p className="text-white/50 mt-2 tracking-wide">Analysis methods applied to this media</p>
