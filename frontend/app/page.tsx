@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Twitter, Github, Linkedin } from "lucide-react"
+import { Github, Linkedin } from "lucide-react"
 import dynamic from 'next/dynamic'
 import HeroSection from "@/components/hero-section"
 
@@ -77,9 +77,27 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { name: "Faizan", role: "Lead Engineer", img: "/images/faizan.png" },
-              { name: "Vallabha", role: "AI Architecture", img: "/images/vallabha.png" },
-              { name: "Gurunanda", role: "Product Design", img: "/images/gurunanda.png" },
+              { 
+                name: "Faizan", 
+                role: "Lead Engineer", 
+                img: "/images/faizan.png",
+                github: "https://github.com/Shaik-Faizan-Ahmed",
+                linkedin: "https://www.linkedin.com/in/faizan-ahmed-shaik/"
+              },
+              { 
+                name: "Vallabha", 
+                role: "AI Architecture", 
+                img: "/images/vallabha.png",
+                github: "http://github.com/vallabhatech",
+                linkedin: "http://linkedin.com/in/vallabha-tech"
+              },
+              { 
+                name: "Gurunanda", 
+                role: "Product Design", 
+                img: "/images/gurunanda.png",
+                github: "https://github.com/Gurunanda-2006",
+                linkedin: "https://www.linkedin.com/in/punna-gurunanda-653432312/"
+              },
             ].map((member, idx) => (
               <div
                 key={idx}
@@ -100,9 +118,12 @@ export default function Home() {
                   <h3 className="text-3xl font-bold mb-1 tracking-tight text-white">{member.name}</h3>
                   <p className="text-cyan-400 font-bold mb-6">{member.role}</p>
                   <div className="flex gap-4 opacity-60 group-hover:opacity-100 transition-opacity">
-                    <Twitter className="w-5 h-5 hover:text-white cursor-pointer transition-colors" />
-                    <Github className="w-5 h-5 hover:text-white cursor-pointer transition-colors" />
-                    <Linkedin className="w-5 h-5 hover:text-white cursor-pointer transition-colors" />
+                    <a href={member.github} target="_blank" rel="noopener noreferrer">
+                      <Github className="w-5 h-5 hover:text-white cursor-pointer transition-colors" />
+                    </a>
+                    <a href={member.linkedin} target="_blank" rel="noopener noreferrer">
+                      <Linkedin className="w-5 h-5 hover:text-white cursor-pointer transition-colors" />
+                    </a>
                   </div>
                 </div>
               </div>
@@ -117,12 +138,11 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-20">
             <div className="space-y-8">
               <h2 className="text-2xl font-bold flex items-center gap-2">
-                <img src="/logo.png" alt="AI Analyzer Logo" className="w-8 h-8 object-contain" loading="lazy" />
-                Analyzer
+                <img src="/new-logo.jpeg" alt="AI Analyzer Logo" className="w-8 h-8 object-contain" loading="lazy" />
+                V.E.R.I.T.A.S
               </h2>
               <p className="text-slate-500 text-sm max-w-xs leading-relaxed">
-                Empowering teams to verify authenticity at the speed of thought, ensuring security remains at the
-                forefront.
+                Helping people make informed judgments about digital media.
               </p>
             </div>
 
@@ -147,7 +167,7 @@ export default function Home() {
           </div>
 
           <div className="mt-24 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-600 text-xs font-medium">
-            <p>© 2026 AI Image Analyzer. Built for innovation and trust.</p>
+            <p>© 2026 V.E.R.I.T.A.S — Media analysis to support informed judgment.</p>
             <div className="flex gap-8">
               <span className="hover:text-white cursor-pointer transition-colors">Privacy</span>
               <span className="hover:text-white cursor-pointer transition-colors">Terms</span>
