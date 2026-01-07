@@ -164,8 +164,10 @@ export default function UploadPage() {
 
   // Pre-connect to SSE on page load for deep scan mode
   useEffect(() => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    
     console.log('Setting up SSE connection on page load...')
-    const eventSource = new EventSource('http://localhost:8000/analyze/progress')
+    const eventSource = new EventSource(`${apiUrl}/analyze/progress`)
     eventSourceRef.current = eventSource
     
     eventSource.onopen = () => {
@@ -227,6 +229,8 @@ export default function UploadPage() {
 
   const handleAnalyze = async (selectedMode: AnalysisMode) => {
     if (!file || !fileType) return
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
     // Clear all previous progress
     setProgress('')
@@ -292,7 +296,7 @@ export default function UploadPage() {
         }, 1500)
       }
 
-      const response = await fetch(`http://localhost:8000${endpoint}`, {
+      const response = await fetch(`${apiUrl}${endpoint}`, {
         method: 'POST',
         body: formData,
       })

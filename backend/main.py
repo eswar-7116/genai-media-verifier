@@ -26,7 +26,14 @@ executor = ThreadPoolExecutor(max_workers=2)
 # Enable CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify exact origins
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:8000",
+        "https://*.vercel.app",
+        "https://*.ngrok-free.dev",
+        "https://*.ngrok.io",
+        "https://*.ngrok.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
