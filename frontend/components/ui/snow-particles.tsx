@@ -116,7 +116,7 @@ export const SnowParticles = ({
     }
 
     return (
-        <div className={cn("absolute inset-0 pointer-events-none z-20", className)} ref={canvasContainerRef}>
+        <div className={cn("absolute inset-0 pointer-events-none z-0", className)} ref={canvasContainerRef}>
             <canvas ref={canvasRef} className="w-full h-full" />
         </div>
     );

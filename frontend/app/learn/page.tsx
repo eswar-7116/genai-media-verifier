@@ -80,9 +80,9 @@ export default function LearnPage() {
         />
 
         {/* Left Side - Video */}
-        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12">
+        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12 z-50">
           <video 
-            className="w-[80%] h-[80%] object-cover rounded-2xl shadow-2xl"
+            className="w-[80%] h-[80%] object-cover rounded-2xl shadow-2xl z-50"
             autoPlay
             muted
             loop
@@ -98,7 +98,7 @@ export default function LearnPage() {
 
         {/* Right Side - Content */}
         <div className="flex-1 flex items-center justify-center p-[60px] relative">
-          <div className="max-w-[520px] relative z-10 -translate-y-[70px] section-content">
+          <div className="max-w-[520px] relative z-10 -translate-y-[20px] section-content">
             <p className="text-sm font-light tracking-[3px] uppercase text-white/50 mb-6">
               DEEPFAKE DETECTION
             </p>
@@ -123,11 +123,11 @@ export default function LearnPage() {
         ref={(el) => { sectionsRef.current[1] = el; }}
         className="snap-section flex h-screen w-screen relative bg-black overflow-hidden"
       >
-        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12">
+        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12 z-50">
           <img 
             src="/section1.jpg"
             alt="Facial Analysis"
-            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl"
+            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl z-50"
           />
           <div className="absolute right-0 top-[10%] bottom-[10%] w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
         </div>
@@ -188,11 +188,11 @@ export default function LearnPage() {
           </div>
         </div>
 
-        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12">
+        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12 z-50">
           <div className="absolute left-0 top-[10%] bottom-[10%] w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
           <video 
             src="/section2.mp4"
-            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl"
+            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl z-50"
             autoPlay
             muted
             loop
@@ -206,10 +206,10 @@ export default function LearnPage() {
         ref={(el) => { sectionsRef.current[3] = el; }}
         className="snap-section flex h-screen w-screen relative bg-black overflow-hidden"
       >
-        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12">
+        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12 z-50">
           <video 
             src="/section3.mp4"
-            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl"
+            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl z-50"
             autoPlay
             muted
             loop
@@ -274,12 +274,12 @@ export default function LearnPage() {
           </div>
         </div>
 
-        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12">
+        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12 z-50">
           <div className="absolute left-0 top-[10%] bottom-[10%] w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
           <img 
             src="/section4.png"
             alt="Lighting Analysis"
-            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl"
+            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl z-50"
           />
         </div>
       </section>
@@ -289,10 +289,10 @@ export default function LearnPage() {
         ref={(el) => { sectionsRef.current[5] = el; }}
         className="snap-section flex h-screen w-screen relative bg-black overflow-hidden"
       >
-        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12">
+        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12 z-50">
           <video 
             src="/section5.mp4"
-            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl"
+            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl z-50"
             autoPlay
             muted
             loop
@@ -357,12 +357,12 @@ export default function LearnPage() {
           </div>
         </div>
 
-        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12">
+        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12 z-50">
           <div className="absolute left-0 top-[10%] bottom-[10%] w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
           <img 
             src="/section6.jpg"
             alt="Digital Artifacts"
-            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl"
+            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl z-50"
           />
         </div>
       </section>
@@ -372,10 +372,10 @@ export default function LearnPage() {
         ref={(el) => { sectionsRef.current[7] = el; }}
         className="snap-section flex h-screen w-screen relative bg-black overflow-hidden"
       >
-        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12">
+        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-12 z-50">
           <video 
             src="/section7.mp4"
-            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl"
+            className="w-[75%] h-[75%] object-cover rounded-2xl shadow-2xl z-50"
             autoPlay
             muted
             loop

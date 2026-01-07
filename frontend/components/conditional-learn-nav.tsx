@@ -14,7 +14,7 @@ export default function ConditionalLearnNav() {
   return (
     <>
       <div className="fixed top-6 left-8 z-50">
-        <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain drop-shadow-lg" />
+        <img src="/new-logo.jpeg" alt="Logo" className="h-10 w-auto object-contain drop-shadow-lg" />
       </div>
       <div className="fixed top-6 left-0 right-0 z-50 flex justify-center pointer-events-none">
         <LearnNavigationPill />
