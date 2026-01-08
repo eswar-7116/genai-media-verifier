@@ -1,0 +1,93 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment - DO NOT UPLOAD
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads and temp files
+uploads/*
+!uploads/.gitkeep
+temp_frames/
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.jpg
+*.png
+*.jpeg
+
+# Model cache
+models_cache/
+*.pth
+*.pt
+*.onnx
+
+# Logs
+*.log
+logs/
+
+# Test files
+test_*.py
+*_test.py
+compare_models.py
+download_cascades.py
+setup_test_data.py
+train_deepfake_models.py
+update_to_finetuned.py
+video_endpoint_fix.txt
+video_analysis_results.json
+
+# Database
+*.db
+*.sqlite
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Coverage
+.coverage
+htmlcov/
+
+# Pytest
+.pytest_cache/

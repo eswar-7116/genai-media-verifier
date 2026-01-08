@@ -23,23 +23,16 @@ app = FastAPI(title="Deepfake Detection API", version="2.0")
 # Thread pool for running heavy analysis without blocking SSE
 executor = ThreadPoolExecutor(max_workers=2)
 
-# Enable CORS for frontend
+# Enable CORS for frontend - using config from environment
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:8000",
-        "https://*.vercel.app",
-        "https://*.ngrok-free.dev",
-        "https://*.ngrok.io",
-        "https://*.ngrok.app",
-    ],
+    allow_origins=config.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-UPLOAD_DIR = "uploads"
+UPLOAD_DIR = config.UPLOAD_DIR
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
@@ -514,4 +507,6 @@ async def startup_event():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    host = os.getenv("HOST", "0.0.0.0")
+    uvicorn.run(app, host=host, port=port)

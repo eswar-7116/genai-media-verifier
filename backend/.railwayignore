@@ -1,0 +1,54 @@
+# Railway Ignore - Don't upload these to Railway
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Test files and data
+test_*.py
+*_test.py
+compare_models.py
+download_cascades.py
+setup_test_data.py
+train_deepfake_models.py
+update_to_finetuned.py
+video_endpoint_fix.txt
+video_analysis_results.json
+
+# Uploads and media
+uploads/*.mp4
+uploads/*.avi
+uploads/*.mov
+uploads/*.mkv
+uploads/*.jpg
+uploads/*.png
+uploads/*.jpeg
+uploads/*.webp
+
+# Model cache (will be downloaded on Railway)
+models_cache/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
