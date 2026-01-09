@@ -1,10 +1,5 @@
 import torch
 from transformers import AutoImageProcessor, AutoModelForImageClassification
-try:
-    from transformers import SiglipImageProcessor
-    SIGLIP_AVAILABLE = True
-except ImportError:
-    SIGLIP_AVAILABLE = False
 from PIL import Image
 import numpy as np
 from models.progress_tracker import get_progress_tracker
@@ -22,16 +17,11 @@ class EnsembleDetector:
         # Load Model 1: Primary HuggingFace model (Siglip architecture)
         try:
             cache_dir = "./models_cache/huggingface"
-            if SIGLIP_AVAILABLE:
-                processor1 = SiglipImageProcessor.from_pretrained(
-                    "prithivMLmods/Deep-Fake-Detector-Model",
-                    cache_dir=cache_dir
-                )
-            else:
-                processor1 = AutoImageProcessor.from_pretrained(
-                    "prithivMLmods/Deep-Fake-Detector-Model",
-                    cache_dir=cache_dir
-                )
+            processor1 = AutoImageProcessor.from_pretrained(
+                "prithivMLmods/Deep-Fake-Detector-Model",
+                cache_dir=cache_dir,
+                use_fast=True
+            )
             model1 = AutoModelForImageClassification.from_pretrained(
                 "prithivMLmods/Deep-Fake-Detector-Model",
                 cache_dir=cache_dir
