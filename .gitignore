@@ -28,7 +28,6 @@ huggingface/
 # User uploads
 backend/uploads/
 uploads/
-*.mp4
 *.avi
 *.mov
 *.mkv

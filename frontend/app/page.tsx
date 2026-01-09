@@ -98,12 +98,33 @@ export default function Home() {
                 github: "https://github.com/Gurunanda-2006",
                 linkedin: "https://www.linkedin.com/in/punna-gurunanda-653432312/"
               },
+              { 
+                name: "Eswar Dudi", 
+                role: "Backend Architect", 
+                img: "/images/eswar.png",
+                github: "https://github.com/eswar-7116",
+                linkedin: "https://www.linkedin.com/in/eswar-dudi/"
+              },
+              { 
+                name: "Mohammad Rayhaanuddin", 
+                role: "Tester", 
+                img: "/images/rayhaan.png",
+                github: "https://github.com/Rayhaan1905",
+                linkedin: "https://www.linkedin.com/in/rayhaan-uddin-22a273322/"
+              },
+              { 
+                name: "Teja Dasarla", 
+                role: "Networking", 
+                img: "/images/teja.png",
+                github: "https://github.com/tejadasarla",
+                linkedin: "https://www.linkedin.com/in/teja-dasarla-4b5647308/"
+              },
             ].map((member, idx) => (
               <div
                 key={idx}
                 className="group relative rounded-3xl glass-card border-white/5 transition-all duration-500 aspect-[4/5] flex flex-col"
               >
-                <div className="relative flex-1">
+                <div className="h-130 relative flex-1">
                   <div className="absolute inset-0 rounded-3xl overflow-hidden z-0">
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
                   </div>

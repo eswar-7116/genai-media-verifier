@@ -5,7 +5,8 @@ from PIL import Image
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 processor = AutoImageProcessor.from_pretrained(
-    "dima806/deepfake_vs_real_image_detection"
+    "dima806/deepfake_vs_real_image_detection",
+    use_fast=True
 )
 
 model = AutoModelForImageClassification.from_pretrained(
