@@ -4,7 +4,6 @@ from PIL import Image
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-# Load pretrained deepfake model
 processor = AutoImageProcessor.from_pretrained(
     "dima806/deepfake_vs_real_image_detection"
 )
@@ -22,5 +21,5 @@ def predict_image(image: Image.Image):
         outputs = model(**inputs)
         probs = torch.softmax(outputs.logits, dim=1)
 
-    fake_prob = probs[0][1].item()   # index 1 = fake
+    fake_prob = probs[0][1].item()
     return fake_prob

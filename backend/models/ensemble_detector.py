@@ -19,7 +19,6 @@ class EnsembleDetector:
         self.model_names = []
         self.model_types = []
         
-        # Load Model 1: Primary HuggingFace model (Siglip architecture)
         try:
             cache_dir = "./models_cache/huggingface"
             if SIGLIP_AVAILABLE:
@@ -45,7 +44,6 @@ class EnsembleDetector:
         except Exception as e:
             pass
         
-        # Load Model 2: Alternative HuggingFace model (different architecture)
         try:
             cache_dir = "./models_cache/huggingface"
             processor2 = AutoImageProcessor.from_pretrained(
