@@ -69,22 +69,17 @@ def get_cors_origins():
     """Parse CORS origins from environment variable"""
     cors_env = os.getenv('CORS_ORIGINS', '')
     
-    # Default origins for development
-    default_origins = [
-        "http://localhost:3000",
-        "http://localhost:8000",
-        "https://*.vercel.app",
-        "https://*.ngrok-free.dev",
-        "https://*.ngrok.io",
-        "https://*.ngrok.app",
-    ]
-    
+    # Check if we're in production with specific domain
     if cors_env:
         # Split by comma and strip whitespace
         custom_origins = [origin.strip() for origin in cors_env.split(',') if origin.strip()]
-        # Merge with defaults
-        return list(set(default_origins + custom_origins))
+        return custom_origins
     
-    return default_origins
+    # Development/testing - allow all origins
+    # Note: Wildcard patterns like *.vercel.app don't work with standard CORS
+    # You need to either:
+    # 1. Allow all with ["*"]
+    # 2. Add your specific Vercel URL as environment variable
+    return ["*"]  # Allow all origins for development
 
 CORS_ORIGINS = get_cors_origins()

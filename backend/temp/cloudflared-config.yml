@@ -1,0 +1,27 @@
+# Cloudflared Configuration for Video Analysis
+# Place this file in: C:\Users\YourUsername\.cloudflared\config.yml
+# Or run: cloudflared tunnel --config cloudflared-config.yml
+
+# Tunnel configuration
+url: http://localhost:8000
+
+# Extended timeouts for video analysis (5 minutes)
+proxy-connect-timeout: 300s
+proxy-tcp-keepalive: 30s
+proxy-no-happy-eyeballs: false
+
+# HTTP/2 for better streaming
+protocol: http2
+
+# Disable chunked encoding (helps with SSE)
+no-chunked-encoding: true
+
+# Set host header
+http-host-header: localhost:8000
+
+# Connection settings
+retries: 3
+grace-period: 30s
+
+# Logging
+loglevel: info

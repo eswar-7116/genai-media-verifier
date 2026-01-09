@@ -11,6 +11,7 @@ import json
 from queue import Queue
 import threading
 from concurrent.futures import ThreadPoolExecutor
+import time
 
 from utils.image_utils import preprocess_image
 from models.deepfake_detector import predict_image
@@ -30,6 +31,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 UPLOAD_DIR = config.UPLOAD_DIR
@@ -161,6 +163,11 @@ async def analyze_image_comprehensive_endpoint(file: UploadFile = File(...)):
             path
         )
         
+        # Check for errors
+        if results is None or 'error' in results:
+            error_msg = results.get('error', 'Analysis failed') if results else 'Analysis returned no results'
+            raise HTTPException(status_code=500, detail=error_msg)
+        
         # Generate detailed report
         report = generate_comprehensive_report(results)
         
@@ -170,10 +177,10 @@ async def analyze_image_comprehensive_endpoint(file: UploadFile = File(...)):
         except:
             pass
         
-        # Build response
+        # Build response with safe defaults
         response = {
-            "final_score": round(results['final_score'], 3),
-            "risk_level": results['risk_level'],
+            "final_score": round(results.get('final_score', 0.5), 3),
+            "risk_level": results.get('risk_level', 'Unknown'),
             "confidence": round(results.get('confidence', 0.0), 3),
             "analysis_type": "comprehensive",
             "report": report
@@ -195,6 +202,8 @@ async def analyze_image_comprehensive_endpoint(file: UploadFile = File(...)):
     except HTTPException:
         raise
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Comprehensive analysis failed: {str(e)}")
 
 
@@ -202,48 +211,63 @@ async def analyze_image_comprehensive_endpoint(file: UploadFile = File(...)):
 async def get_analysis_progress():
     """
     Server-Sent Events endpoint for real-time progress updates
+    IMPROVED: Better error handling and connection stability
     """
     async def event_generator():
         tracker = get_progress_tracker()
         message_queue = Queue()
+        last_heartbeat = time.time()
         
         def callback(message):
             try:
                 message_queue.put(message)
-            except:
-                pass
+            except Exception as e:
+                print(f"Callback error: {e}")
         
         tracker.add_callback(callback)
         
         try:
             while True:
-                # Check for new messages
-                if not message_queue.empty():
-                    message = message_queue.get()
-                    yield f"data: {json.dumps({'message': message})}\n\n"
-                else:
-                    # Send heartbeat to keep connection alive
+                try:
+                    # Check for new messages with timeout
+                    if not message_queue.empty():
+                        message = message_queue.get_nowait()
+                        data = json.dumps({'message': message})
+                        yield f"data: {data}\n\n"
+                        last_heartbeat = time.time()
+                    else:
+                        # Send heartbeat every 15 seconds to keep connection alive
+                        current_time = time.time()
+                        if current_time - last_heartbeat > 15:
+                            yield f": heartbeat\n\n"
+                            last_heartbeat = current_time
+                        
+                        # Small sleep to prevent CPU spinning
+                        await asyncio.sleep(0.1)
+                        
+                except Exception as e:
+                    print(f"SSE error: {e}")
                     await asyncio.sleep(0.1)
-        except (asyncio.CancelledError, GeneratorExit):
+                    
+        except (asyncio.CancelledError, GeneratorExit) as e:
             # Client disconnected - clean up gracefully
-            try:
-                tracker.callbacks.remove(callback)
-            except:
-                pass
+            print(f"SSE connection closed: {type(e).__name__}")
         finally:
             # Always try to remove callback on exit
             try:
-                tracker.callbacks.remove(callback)
-            except:
-                pass
+                if callback in tracker.callbacks:
+                    tracker.callbacks.remove(callback)
+            except Exception as e:
+                print(f"Cleanup error: {e}")
     
     return StreamingResponse(
         event_generator(),
         media_type="text/event-stream",
         headers={
-            "Cache-Control": "no-cache",
+            "Cache-Control": "no-cache, no-transform",
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",
+            "Access-Control-Allow-Origin": "*",
         }
     )
 
@@ -354,19 +378,22 @@ async def analyze_video_comprehensive_endpoint(file: UploadFile = File(...)):
             pass
         
         # Check for errors
+        if results is None:
+            raise HTTPException(status_code=500, detail="Analysis returned no results")
+            
         if 'error' in results:
             raise HTTPException(status_code=500, detail=results['error'])
         
-        # Build response
+        # Build response with safe defaults
         response = {
-            "final_score": round(results['final_score'], 3),
-            "risk_level": results['risk_level'],
+            "final_score": round(results.get('final_score', 0.5), 3),
+            "risk_level": results.get('risk_level', 'Unknown'),
             "confidence": round(results.get('confidence', 0.0), 3),
             "analysis_type": "comprehensive_hybrid",
             "method_breakdown": results.get('method_breakdown', {})
         }
         
-        # Add layer summaries
+        # Add layer summaries with safe gets
         response["layer_summaries"] = {}
         
         # Layer 1: Metadata

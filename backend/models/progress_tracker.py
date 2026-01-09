@@ -1,28 +1,48 @@
 """
 Progress tracking system for real-time updates to frontend
+IMPROVED: Better thread safety and error handling
 """
-import asyncio
-from typing import Optional, Callable
+import threading
+from typing import Optional, Callable, List
 
 class ProgressTracker:
     def __init__(self):
-        self.callbacks = []
-        self.messages = []
+        self.callbacks: List[Callable] = []
+        self.messages: List[str] = []
+        self._lock = threading.Lock()
     
     def add_callback(self, callback: Callable[[str], None]):
         """Add a callback function to be called on progress updates"""
-        self.callbacks.append(callback)
+        with self._lock:
+            if callback not in self.callbacks:
+                self.callbacks.append(callback)
+    
+    def remove_callback(self, callback: Callable[[str], None]):
+        """Remove a specific callback"""
+        with self._lock:
+            if callback in self.callbacks:
+                self.callbacks.remove(callback)
     
     def update(self, message: str):
         """Send progress update to all callbacks"""
         # Remove emojis and sanitize for SSE
         sanitized = self._sanitize_message(message)
-        self.messages.append(sanitized)
-        for callback in self.callbacks:
+        
+        with self._lock:
+            self.messages.append(sanitized)
+            # Create a copy of callbacks to avoid modification during iteration
+            callbacks_copy = self.callbacks.copy()
+        
+        # Call callbacks outside of lock to avoid deadlocks
+        for callback in callbacks_copy:
             try:
                 callback(sanitized)
-            except Exception:
-                pass  # Silently skip failed callbacks
+            except Exception as e:
+                print(f"Callback error: {e}")
+                # Remove failed callback
+                with self._lock:
+                    if callback in self.callbacks:
+                        self.callbacks.remove(callback)
     
     def _sanitize_message(self, message: str) -> str:
         """Remove emojis, clean up, and shorten messages for frontend display"""
@@ -72,20 +92,30 @@ class ProgressTracker:
     
     def clear(self):
         """Clear all callbacks and messages"""
-        self.callbacks = []
-        self.messages = []
+        with self._lock:
+            self.callbacks = []
+            self.messages = []
+    
+    def get_messages(self) -> List[str]:
+        """Get a copy of all messages"""
+        with self._lock:
+            return self.messages.copy()
 
 # Global progress tracker
 _global_tracker = None
+_tracker_lock = threading.Lock()
 
-def get_progress_tracker():
+def get_progress_tracker() -> ProgressTracker:
     global _global_tracker
-    if _global_tracker is None:
-        _global_tracker = ProgressTracker()
-    return _global_tracker
+    with _tracker_lock:
+        if _global_tracker is None:
+            _global_tracker = ProgressTracker()
+        return _global_tracker
 
 def reset_progress_tracker():
     """Clear messages but keep callbacks alive for SSE"""
     global _global_tracker
-    if _global_tracker is not None:
-        _global_tracker.messages = []  # Clear old messages but KEEP callbacks
+    with _tracker_lock:
+        if _global_tracker is not None:
+            with _global_tracker._lock:
+                _global_tracker.messages = []  # Clear old messages but KEEP callbacks
