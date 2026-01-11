@@ -124,7 +124,3 @@ MAX_FILE_SIZE=100000000
 ## Contributing
 
 PRs welcome. Please test locally before submitting.
-
-## License
-
-MIT
