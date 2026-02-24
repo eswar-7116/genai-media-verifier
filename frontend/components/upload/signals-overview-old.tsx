@@ -5,16 +5,12 @@ interface SignalsOverviewProps {
   fileType: 'image' | 'video'
 }
 
-// Ensemble Distribution Strip Component
 function EnsembleDistributionStrip({ avgScore, maxScore }: { avgScore: number; maxScore: number }) {
-  // Generate simulated distribution based on avg and max
   const generateDistribution = () => {
     const bars = 16
     const distribution = []
     for (let i = 0; i < bars; i++) {
-      // Create variation around average with one peak at max
       let value = avgScore + (Math.random() - 0.5) * 0.3
-      // Ensure one bar hits the max
       if (i === Math.floor(bars * 0.7)) {
         value = maxScore
       }
@@ -55,33 +51,26 @@ function EnsembleDistributionStrip({ avgScore, maxScore }: { avgScore: number; m
   )
 }
 
-// Identity Timeline Component
 function IdentityTimeline({ shifts }: { shifts: number }) {
-  // Simulate realistic clustering of identity shifts
-  // Timeline length represents ~50 frames (backend extraction default)
-  // More shifts = more clusters, closer shifts = bigger/tighter markers
   const generateClusters = () => {
     if (shifts === 0) return []
     
     const totalFrames = 50
     const clusters: { position: number; intensity: number; count: number }[] = []
     
-    // Determine number of clusters based on shift count
     let numClusters = 1
     if (shifts > 30) numClusters = 5
     else if (shifts > 20) numClusters = 4
     else if (shifts > 10) numClusters = 3
     else if (shifts > 5) numClusters = 2
     
-    // Distribute shifts across clusters
     const shiftsPerCluster = Math.floor(shifts / numClusters)
     const remainingShifts = shifts % numClusters
     
     for (let i = 0; i < numClusters; i++) {
       const clusterShifts = shiftsPerCluster + (i < remainingShifts ? 1 : 0)
-      const position = ((i + 0.5) / numClusters) * 100 // Spread clusters evenly
+      const position = ((i + 0.5) / numClusters) * 100
       
-      // Higher shift count in cluster = higher intensity
       const intensity = Math.min(clusterShifts / 10, 1)
       
       clusters.push({
@@ -96,21 +85,18 @@ function IdentityTimeline({ shifts }: { shifts: number }) {
 
   const clusters = generateClusters()
   
-  // Generate individual markers from clusters
   const generateMarkers = () => {
     const markers: { position: number; size: number }[] = []
     
     clusters.forEach(cluster => {
-      // More concentrated clusters = markers closer together
-      const spread = 8 / (cluster.intensity * 2 + 1) // Tighter spread for high intensity
-      const markerCount = Math.min(cluster.count, 8) // Max 8 visible markers per cluster
+      const spread = 8 / (cluster.intensity * 2 + 1)
+      const markerCount = Math.min(cluster.count, 8)
       
       for (let i = 0; i < markerCount; i++) {
         const offset = (i - markerCount / 2) * spread
         const position = Math.max(2, Math.min(98, cluster.position + offset))
         
-        // Size based on intensity: bigger markers for tighter clusters
-        const size = 6 + cluster.intensity * 6 // 6-12px
+        const size = 6 + cluster.intensity * 6
         
         markers.push({ position, size })
       }
@@ -125,17 +111,14 @@ function IdentityTimeline({ shifts }: { shifts: number }) {
     <div className="space-y-3">
       <div className="text-sm font-medium text-neutral-700">Temporal Consistency</div>
       <div className="relative h-10 flex items-center px-2">
-        {/* Timeline base - represents full video length (~50 frames) */}
         <div className="absolute inset-x-2 h-0.5 bg-neutral-300" />
         
-        {/* Frame tick marks (subtle background) - 50 frames */}
         <div className="absolute inset-x-2 flex justify-between">
           {Array.from({ length: 50 }).map((_, i) => (
             <div key={i} className="w-px h-1 bg-neutral-200" />
           ))}
         </div>
         
-        {/* Identity shift markers - clustered and sized by intensity */}
         {markers.map((marker, idx) => (
           <div
             key={idx}
@@ -157,7 +140,6 @@ function IdentityTimeline({ shifts }: { shifts: number }) {
   )
 }
 
-// Global Temporal Coherence Strip
 function CoherenceStrip({ score }: { score: number }) {
   const coherence = Math.round(score * 100)
   
@@ -184,7 +166,6 @@ function CoherenceStrip({ score }: { score: number }) {
   )
 }
 
-// Physiological Plausibility Band
 function PhysiologicalBand({ 
   score, 
   blinkNatural, 
@@ -228,7 +209,6 @@ function PhysiologicalBand({
   )
 }
 
-// Audio Waveform Component
 function AudioWaveform({ score }: { score: number }) {
   const waveHeights = [3, 5, 2, 6, 4, 7, 3, 5, 2, 4, 6, 3, 5, 7, 4, 2, 5, 6, 3, 4]
   
@@ -251,7 +231,6 @@ function AudioWaveform({ score }: { score: number }) {
   )
 }
 
-// Physics Plausibility Band
 function PhysicsBand({ score, lightingConsistent, depthPlausible }: { 
   score: number
   lightingConsistent: boolean
@@ -282,7 +261,6 @@ function PhysicsBand({ score, lightingConsistent, depthPlausible }: {
   )
 }
 
-// Metadata Card (for images)
 function MetadataCard({ score, detail }: { score: number; detail: string }) {
   const percentage = Math.round(score * 100)
   
@@ -397,11 +375,9 @@ export default function SignalsOverview({ results, fileType }: SignalsOverviewPr
     )
   }
 
-  // Video analysis
   const layerSummaries = results.layer_summaries || {}
   const cards = []
 
-  // Frame Ensemble
   if (layerSummaries.visual?.frame_based) {
     cards.push({
       type: 'ensemble',
@@ -409,7 +385,6 @@ export default function SignalsOverview({ results, fileType }: SignalsOverviewPr
     })
   }
 
-  // Temporal Consistency
   if (layerSummaries.visual?.temporal) {
     cards.push({
       type: 'temporal',
@@ -417,7 +392,6 @@ export default function SignalsOverview({ results, fileType }: SignalsOverviewPr
     })
   }
 
-  // Video Model Analysis
   if (layerSummaries.visual?.['3d_model']) {
     cards.push({
       type: 'coherence',
@@ -425,7 +399,6 @@ export default function SignalsOverview({ results, fileType }: SignalsOverviewPr
     })
   }
 
-  // Physiological Signals
   if (layerSummaries.physiological) {
     cards.push({
       type: 'physiological',
@@ -433,7 +406,6 @@ export default function SignalsOverview({ results, fileType }: SignalsOverviewPr
     })
   }
 
-  // Physics Consistency
   if (layerSummaries.physics) {
     cards.push({
       type: 'physics',
@@ -441,7 +413,6 @@ export default function SignalsOverview({ results, fileType }: SignalsOverviewPr
     })
   }
 
-  // Metadata/Audio
   if (layerSummaries.metadata) {
     if (layerSummaries.metadata.has_audio && layerSummaries.audio?.score) {
       cards.push({

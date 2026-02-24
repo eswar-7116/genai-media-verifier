@@ -7,7 +7,6 @@ export default function HeroSection() {
 
   return (
     <div id="home" className="flex h-screen w-screen relative bg-gradient-to-br from-black via-[#0a0a0f] to-black overflow-hidden z-10">
-      {/* Noise texture overlay - optimized with will-change */}
       <div 
         className="fixed inset-0 pointer-events-none z-[9999] opacity-[0.03]"
         style={{
@@ -16,7 +15,6 @@ export default function HeroSection() {
         }}
       />
 
-      {/* Left Side - Video Visual with lazy loading */}
       <div className="flex-1 relative overflow-hidden flex items-center justify-center">
         <video 
           className="w-full h-full object-cover"
@@ -24,19 +22,16 @@ export default function HeroSection() {
           muted
           loop
           playsInline
-          preload="metadata" // Only load metadata initially
-          poster="/video-poster.jpg" // Add a poster image for faster initial load
+          preload="metadata"
+          poster="/video-poster.jpg"
         >
           <source src="/Unsettling_Glitched_Face_Video_Generation.mp4" type="video/mp4" />
         </video>
         
-        {/* Vertical divider line */}
         <div className="absolute right-0 top-[10%] bottom-[10%] w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
       </div>
 
-      {/* Right Side - Content Section */}
       <div className="flex-1 flex items-center justify-center p-[60px] relative">
-        {/* Background gradient overlay */}
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -48,24 +43,19 @@ export default function HeroSection() {
         />
 
         <div className="max-w-[520px] relative z-10 -translate-y-[70px]">
-          {/* Subtitle */}
           <p className="text-sm font-light tracking-[3px] uppercase text-white/50 mb-6 animate-fade-in-up opacity-0 [animation-delay:0.2s] [animation-fill-mode:forwards]">
             TRUST WHAT YOU SEE?
           </p>
 
-          {/* Main Title */}
           <h1 className="text-[92px] font-normal tracking-[12px] leading-none mb-8 text-white uppercase animate-fade-in-up opacity-0 [animation-delay:0.4s] [animation-fill-mode:forwards] font-space">
             V.E.R.I.T.A.S
           </h1>
 
-          {/* Description */}
           <p className="text-[17px] font-light text-white/60 mb-[120px] tracking-[0.5px] animate-fade-in-up opacity-0 [animation-delay:0.6s] [animation-fill-mode:forwards]">
             AI-assisted media credibility analysis
           </p>
 
-          {/* Buttons */}
           <div className="flex gap-5 animate-fade-in-up opacity-0 [animation-delay:0.8s] [animation-fill-mode:forwards]">
-            {/* Upload Button */}
             <button 
               onClick={() => router.push('/upload')}
               className="group relative px-12 py-4 text-[15px] font-normal tracking-[1px] uppercase border border-white/20 bg-white/[0.08] backdrop-blur-[10px] text-white cursor-pointer overflow-hidden transition-all duration-300 hover:bg-white/[0.12] hover:border-white/35 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(255,255,255,0.08)] will-change-transform"
@@ -74,7 +64,6 @@ export default function HeroSection() {
               <span className="absolute top-1/2 left-1/2 w-0 h-0 rounded-full bg-white/10 -translate-x-1/2 -translate-y-1/2 transition-all duration-[600ms] group-hover:w-[300px] group-hover:h-[300px]" />
             </button>
 
-            {/* Learn Button */}
             <button 
               onClick={() => router.push('/learn')}
               className="group relative px-12 py-4 text-[15px] font-normal tracking-[1px] uppercase border border-white/15 bg-transparent text-white/70 cursor-pointer overflow-hidden transition-all duration-300 hover:text-white/90 hover:border-white/25 hover:-translate-y-0.5 will-change-transform"
@@ -102,12 +91,9 @@ export default function HeroSection() {
           animation: fadeInUp 0.8s ease forwards;
         }
 
-        /* Use GPU acceleration */
         .will-change-transform {
           will-change: transform;
         }
-
-        /* Responsive */
         @media (max-width: 1024px) {
           .flex-1:first-child::after {
             display: none;

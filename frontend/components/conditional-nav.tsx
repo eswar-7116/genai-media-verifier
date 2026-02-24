@@ -6,7 +6,6 @@ import { PillBase } from "@/components/ui/3d-adaptive-navigation-bar"
 export default function ConditionalNav() {
   const pathname = usePathname()
   
-  // Hide navbar on upload page
   if (pathname === '/upload') {
     return null
   }

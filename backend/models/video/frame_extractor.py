@@ -1,11 +1,3 @@
-"""
-Smart Frame Extractor - LAYER 2A
-Intelligently extracts frames from video based on:
-- Scene changes
-- Face presence
-- Video boundaries (first/last frames)
-- Motion intensity
-"""
 import cv2
 import numpy as np
 import os
@@ -13,26 +5,9 @@ from scenedetect import detect, ContentDetector, AdaptiveDetector
 
 
 def smart_frame_extraction(video_path, output_dir="temp_frames", target_frames=50):
-    """
-    Extract frames intelligently from video
-    
-    Args:
-        video_path: Path to video file
-        output_dir: Directory to save frames
-        target_frames: Target number of frames to extract
-    
-    Returns:
-        dict: {
-            'frames': list of frame paths,
-            'timestamps': list of timestamps,
-            'scene_boundaries': list of scene change timestamps,
-            'face_frames': list of frames with faces
-        }
-    """
     try:
         os.makedirs(output_dir, exist_ok=True)
         
-        # Clear previous frames
         for f in os.listdir(output_dir):
             if f.endswith('.jpg'):
                 os.remove(os.path.join(output_dir, f))
@@ -48,19 +23,15 @@ def smart_frame_extraction(video_path, output_dir="temp_frames", target_frames=5
         
         cap.release()
         
-        # Strategy for frame extraction
         frame_indices = set()
         
-        # 1. Scene boundaries (high priority)
         scene_frames = detect_scene_changes(video_path, fps, total_frames)
         frame_indices.update(scene_frames)
         
-        # 2. First and last 10 frames (boundaries often show artifacts)
         boundary_frames = list(range(0, min(10, total_frames)))
         boundary_frames.extend(range(max(0, total_frames - 10), total_frames))
         frame_indices.update(boundary_frames)
         
-        # 3. Regular sampling to fill remaining slots
         current_count = len(frame_indices)
         if current_count < target_frames:
             remaining = target_frames - current_count
@@ -68,10 +39,8 @@ def smart_frame_extraction(video_path, output_dir="temp_frames", target_frames=5
             regular_samples = list(range(0, total_frames, step))[:remaining]
             frame_indices.update(regular_samples)
         
-        # Sort frame indices
         frame_indices = sorted(list(frame_indices))[:target_frames]
         
-        # Extract frames
         extracted_frames = []
         timestamps = []
         
@@ -89,7 +58,6 @@ def smart_frame_extraction(video_path, output_dir="temp_frames", target_frames=5
         
         cap.release()
         
-        # Detect which frames have faces
         face_frames = detect_face_frames(extracted_frames)
         
         return {
@@ -102,20 +70,15 @@ def smart_frame_extraction(video_path, output_dir="temp_frames", target_frames=5
         
     except Exception as e:
         print(f"Smart frame extraction error: {e}")
-        # Fallback to simple extraction
         return simple_frame_extraction(video_path, output_dir, target_frames)
 
 
 def detect_scene_changes(video_path, fps, total_frames, threshold=27.0):
-    """Detect scene changes using PySceneDetect"""
     try:
-        # Use PySceneDetect
         scene_list = detect(video_path, ContentDetector(threshold=threshold))
         
-        # Convert to frame indices
         scene_frames = []
         for scene in scene_list:
-            # Get frame number of scene start
             start_frame = int(scene[0].get_frames())
             scene_frames.append(start_frame)
         
@@ -123,19 +86,17 @@ def detect_scene_changes(video_path, fps, total_frames, threshold=27.0):
         
     except Exception as e:
         print(f"Scene detection error: {e}, using fallback")
-        # Fallback: simple motion-based detection
         return detect_scene_changes_fallback(video_path, fps, total_frames)
 
 
 def detect_scene_changes_fallback(video_path, fps, total_frames):
-    """Fallback scene detection using frame differences"""
     try:
         cap = cv2.VideoCapture(video_path)
         scene_frames = []
         
         prev_frame = None
         frame_idx = 0
-        sample_rate = max(1, int(fps))  # Sample at 1 fps
+        sample_rate = max(1, int(fps))
         
         while frame_idx < total_frames:
             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
@@ -151,7 +112,6 @@ def detect_scene_changes_fallback(video_path, fps, total_frames):
                 diff = cv2.absdiff(prev_frame, gray)
                 mean_diff = np.mean(diff)
                 
-                # If large difference, likely scene change
                 if mean_diff > 30:
                     scene_frames.append(frame_idx)
             
@@ -167,9 +127,7 @@ def detect_scene_changes_fallback(video_path, fps, total_frames):
 
 
 def detect_face_frames(frame_paths):
-    """Detect which frames contain faces"""
     try:
-        # Use OpenCV directly - more reliable for batch processing
         return detect_face_frames_opencv(frame_paths)
         
     except Exception as e:
@@ -178,7 +136,6 @@ def detect_face_frames(frame_paths):
 
 
 def detect_face_frames_opencv(frame_paths):
-    """Fallback face detection using OpenCV"""
     try:
         face_cascade = cv2.CascadeClassifier(
             cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
@@ -205,7 +162,6 @@ def detect_face_frames_opencv(frame_paths):
 
 
 def simple_frame_extraction(video_path, output_dir, target_frames):
-    """Simple fallback frame extraction"""
     try:
         os.makedirs(output_dir, exist_ok=True)
         

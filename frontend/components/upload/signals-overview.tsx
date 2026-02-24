@@ -10,7 +10,6 @@ interface SignalsOverviewProps {
   hoveredChart?: string | null
 }
 
-// Ensemble Distribution Strip with D3
 function EnsembleDistributionStrip({ avgScore, maxScore, id, onHover, isHovered, isDimmed }: { avgScore: number; maxScore: number; id: string; onHover: (id: string | null) => void; isHovered: boolean; isDimmed: boolean }) {
   const svgRef = useRef<SVGSVGElement>(null)
 
@@ -369,6 +368,29 @@ function PhysicsBand({ score, lightingConsistent, depthPlausible, id, onHover, i
   )
 }
 
+function MetadataCard({ score, hasAudio, suspiciousCount, id, onHover, isHovered, isDimmed }: { score: number; hasAudio: boolean; suspiciousCount: number; id: string; onHover: (id: string | null) => void; isHovered: boolean; isDimmed: boolean }) {
+  return (
+    <div 
+      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center bg-[#1a1a1a] ${
+        isHovered ? 'scale-110 z-50 border-cyan-500/50 shadow-[0_0_40px_rgba(0,243,255,0.3)] bg-white/[0.08]' 
+        : isDimmed ? 'opacity-40 scale-95' 
+        : 'hover:border-cyan-500/30 hover:scale-105'
+      }`}
+      onMouseEnter={() => onHover(id)}
+      onMouseLeave={() => onHover(null)}
+    >
+      <div className="space-y-3">
+        <div className="text-sm font-light tracking-wider uppercase text-white/70">Metadata Forensics</div>
+        <div className="space-y-2 text-xs text-white/60">
+          <div className="flex items-start gap-2"><span className="text-white/30">•</span><span>Audio: {hasAudio ? 'Present' : 'Not present'}</span></div>
+          <div className="flex items-start gap-2"><span className="text-white/30">•</span><span>Suspicious indicators: {suspiciousCount}</span></div>
+        </div>
+        <div className="text-xs text-white/50">{Math.round(score * 100)}% anomaly score</div>
+      </div>
+    </div>
+  )
+}
+
 function ImageChart({ score, title, detail, id, onHover, isHovered, isDimmed }: { score: number; title: string; detail: string; id: string; onHover: (id: string | null) => void; isHovered: boolean; isDimmed: boolean }) {
   const svgRef = useRef<SVGSVGElement>(null)
 
@@ -410,30 +432,6 @@ function ImageChart({ score, title, detail, id, onHover, isHovered, isDimmed }: 
   )
 }
 
-function MetadataCard({ score, hasAudio, suspiciousCount, id, onHover, isHovered, isDimmed }: { score: number; hasAudio: boolean; suspiciousCount: number; id: string; onHover: (id: string | null) => void; isHovered: boolean; isDimmed: boolean }) {
-  return (
-    <div 
-      className={`border border-white/10 rounded-2xl p-6 cursor-pointer transition-all duration-500 ease-out h-full flex flex-col justify-center bg-[#1a1a1a] ${
-        isHovered ? 'scale-110 z-50 border-cyan-500/50 shadow-[0_0_40px_rgba(0,243,255,0.3)] bg-white/[0.08]' 
-        : isDimmed ? 'opacity-40 scale-95' 
-        : 'hover:border-cyan-500/30 hover:scale-105'
-      }`}
-      onMouseEnter={() => onHover(id)}
-      onMouseLeave={() => onHover(null)}
-    >
-      <div className="space-y-3">
-        <div className="text-sm font-light tracking-wider uppercase text-white/70">Metadata Forensics</div>
-        <div className="space-y-2 text-xs text-white/60">
-          <div className="flex items-start gap-2"><span className="text-white/30">•</span><span>Audio: {hasAudio ? 'Present' : 'Not present'}</span></div>
-          <div className="flex items-start gap-2"><span className="text-white/30">•</span><span>Suspicious indicators: {suspiciousCount}</span></div>
-        </div>
-        <div className="text-xs text-white/50">{Math.round(score * 100)}% anomaly score</div>
-      </div>
-    </div>
-  )
-}
-
-// Main component
 export default function SignalsOverview({ results, fileType, onChartHover, hoveredChart }: SignalsOverviewProps) {
   const [localHoveredChart, setLocalHoveredChart] = useState<string | null>(null)
   
@@ -513,7 +511,6 @@ export default function SignalsOverview({ results, fileType, onChartHover, hover
     )
   }
 
-  // Video analysis
   const layerSummaries = results.layer_summaries || {}
   const cards = []
 

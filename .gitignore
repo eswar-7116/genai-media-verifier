@@ -1,4 +1,3 @@
-# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -9,7 +8,6 @@ venv/
 env/
 ENV/
 
-# Model cache - NEVER commit these
 backend/models_cache/
 models_cache/
 *.caffemodel
@@ -21,51 +19,77 @@ models_cache/
 *.safetensors
 *.bin
 
-# HuggingFace cache
 huggingface/
 .cache/
 
-# User uploads
 backend/uploads/
 uploads/
 *.avi
 *.mov
 *.mkv
 
-# IDE
 .vscode/
 .idea/
 
-# OS
 .DS_Store
 Thumbs.db
 
-# Environment variables
 .env
 .env.local
 
-# Test files
 *.log
 
 test_data/
 
-# IDE / Editor
-.vscode/
-.idea/
 *.swp
 *.swo
 *~
 
-# OS files
-.DS_Store
-Thumbs.db
-
-# Lock files (we use npm, ignore others)
 pnpm-lock.yaml
 yarn.lock
 
-# Testing
 /coverage
 
-# Misc
 *.pem
+
+frontend/node_modules/
+frontend/.pnp
+frontend/.pnp.js
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.env*
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+frontend/.vercel
+
+backend/.venv/
+backend/build/
+backend/dist/
+backend/*.egg-info/
+backend/.eggs/
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+backend/.tox/
+backend/.nox/
+backend/.mypy_cache/
+backend/.dmypy.json
+backend/dmypy.json
+backend/.ruff_cache/
+backend/uv.lock
+backend/.pdm-python
+backend/.pdm-build/
+
+backend/temp/*
+!backend/temp/.gitkeep
+backend/temp_frames/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.envrc
+genai-media-verifier.code-workspace

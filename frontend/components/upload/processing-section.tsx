@@ -18,7 +18,6 @@ export default function ProcessingSection({ file, progress, uploadProgress, curr
 
   useEffect(() => {
     if (file) {
-      // Create thumbnail for uploaded file
       if (file.type.startsWith('image/')) {
         const reader = new FileReader()
         reader.onload = (e) => {
@@ -26,7 +25,6 @@ export default function ProcessingSection({ file, progress, uploadProgress, curr
         }
         reader.readAsDataURL(file)
       } else if (file.type.startsWith('video/')) {
-        // For video, create a placeholder or extract first frame
         const video = document.createElement('video')
         video.preload = 'metadata'
         video.onloadedmetadata = () => {
@@ -44,18 +42,15 @@ export default function ProcessingSection({ file, progress, uploadProgress, curr
       }
     }
 
-    // Trigger animation
     setTimeout(() => setIsAnimating(true), 100)
   }, [file])
   
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Grid */}
       <div className="absolute inset-0 bg-grid opacity-20" />
       
       <div className={`relative w-full h-full z-10 transition-all duration-1000 ease-out ${isAnimating ? 'opacity-100' : 'opacity-0'}`}>
         <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
-          {/* LEFT SIDE - Upload Box with equal margins */}
           <div className={`transition-all duration-1000 flex items-center justify-center p-8 ${isAnimating ? 'translate-x-0' : '-translate-x-20'}`}>
             <div className="w-4/5 space-y-4">
               <div className="glass-card rounded-3xl p-8 border-neon-blue bg-white/[0.06]">
@@ -72,7 +67,6 @@ export default function ProcessingSection({ file, progress, uploadProgress, curr
                     </p>
                   </div>
                   
-                  {/* Status indicator */}
                   <div className="pt-6 border-t border-white/10">
                     <div className="inline-flex items-center gap-3 px-6 py-3 bg-cyan-500/10 border border-cyan-500/30 rounded-full">
                       <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(0,243,255,0.8)]" />
@@ -84,7 +78,6 @@ export default function ProcessingSection({ file, progress, uploadProgress, curr
                 </div>
               </div>
 
-              {/* Cancel Button */}
               <button
                 onClick={onCancel}
                 className="w-full group relative px-6 py-4 glass-card border-red-500/30 bg-red-500/10 rounded-2xl overflow-hidden transition-all duration-300 hover:bg-red-500/20 hover:border-red-500/50 hover:-translate-y-1"
@@ -100,10 +93,8 @@ export default function ProcessingSection({ file, progress, uploadProgress, curr
             </div>
           </div>
 
-          {/* RIGHT SIDE - Preview & Progress with equal margins */}
           <div className={`transition-all duration-1000 delay-300 flex items-center justify-center p-8 ${isAnimating ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0'}`}>
             <div className="w-full space-y-6">
-              {/* File Preview Thumbnail */}
               {thumbnailUrl && (
                 <div className="glass-card border-white/10 rounded-2xl p-6 backdrop-blur-xl">
                   <p className="text-xs font-light tracking-[2px] uppercase text-white/50 mb-4">
@@ -120,7 +111,6 @@ export default function ProcessingSection({ file, progress, uploadProgress, curr
                 </div>
               )}
 
-              {/* Progress Bar */}
               <div className="glass-card border-white/10 rounded-2xl p-6 backdrop-blur-xl space-y-4">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-light tracking-[2px] uppercase text-white/50">
@@ -131,7 +121,6 @@ export default function ProcessingSection({ file, progress, uploadProgress, curr
                   </p>
                 </div>
                 
-                {/* Progress bar */}
                 <div className="relative w-full h-2 bg-white/5 rounded-full overflow-hidden">
                   <div 
                     className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500 ease-out rounded-full"
@@ -141,7 +130,6 @@ export default function ProcessingSection({ file, progress, uploadProgress, curr
                   </div>
                 </div>
 
-                {/* Current Stage */}
                 <div className="pt-2 border-t border-white/5">
                   <p className="text-xs font-light tracking-[2px] uppercase text-white/30 mb-2">
                     CURRENT STAGE

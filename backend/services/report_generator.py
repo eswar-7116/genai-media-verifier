@@ -5,10 +5,6 @@ def generate_report(
     frames_analyzed=None,
     detailed_breakdown=None
 ):
-    """
-    Enhanced deterministic, rule-based credibility report.
-    No LLMs. No APIs. Fully explainable.
-    """
 
     intro = (
         f"This {media_type} was analyzed using a comprehensive multi-method "
@@ -55,7 +51,7 @@ def generate_report(
             "evade automated detection systems."
         )
 
-    # Add detailed breakdown if provided
+
     if detailed_breakdown:
         breakdown_section = (
             "\n\nDetailed Analysis Breakdown:\n"
@@ -85,15 +81,6 @@ def generate_report(
 
 
 def generate_comprehensive_report(analysis_results):
-    """
-    Generate report from comprehensive analysis results.
-    
-    Args:
-        analysis_results: Dict containing all analysis results
-    
-    Returns:
-        str: Formatted report
-    """
     from services.comprehensive_analyzer import generate_detailed_breakdown
     
     final_score = analysis_results.get('final_score', 0.5)

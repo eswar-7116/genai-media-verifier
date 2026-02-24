@@ -4,7 +4,6 @@ from PIL import Image
 import numpy as np
 from models.progress_tracker import get_progress_tracker
 
-# Fix for torch.compiler compatibility issue with Transformers 4.57.3
 if not hasattr(torch, 'compiler'):
     class _MockCompiler:
         @staticmethod
@@ -86,21 +85,6 @@ class EnsembleDetector:
             print("To fix: Ensure models_cache directory exists and models can download.")
     
     def predict_ensemble(self, image, silent=False):
-        """
-        Run all models and combine predictions with weighted voting.
-        
-        Args:
-            image: PIL Image or path to image
-            silent: If True, suppress progress updates (useful for batch/video analysis)
-        
-        Returns:
-            dict: {
-                'score': float (0-1, higher = more likely fake),
-                'confidence': float,
-                'individual_scores': list,
-                'model_agreement': str
-            }
-        """
         tracker = get_progress_tracker()
         
         if not silent:
@@ -190,7 +174,6 @@ class EnsembleDetector:
         }
     
     def _predict_huggingface(self, image, model, processor, model_num, total_models, silent=False):
-        """Run inference on HuggingFace model"""
         if not silent:
             tracker = get_progress_tracker()
             tracker.update(f"      Running neural network inference...")
@@ -206,7 +189,6 @@ class EnsembleDetector:
         return fake_prob, confidence
     
     def _weighted_voting(self, predictions, confidences):
-        """Combine predictions using confidence-weighted voting"""
         if len(predictions) == 0:
             return 0.5
         
@@ -221,7 +203,6 @@ class EnsembleDetector:
         return final_score
     
     def _calculate_agreement(self, predictions):
-        """Calculate how much models agree"""
         if len(predictions) < 2:
             return "single_model"
         
@@ -248,6 +229,5 @@ def get_ensemble_detector():
 
 
 def predict_ensemble(image, silent=False):
-    """Convenience function"""
     detector = get_ensemble_detector()
     return detector.predict_ensemble(image, silent=silent)

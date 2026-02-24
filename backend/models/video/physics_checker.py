@@ -1,7 +1,3 @@
-"""
-Physics and Consistency Checker - LAYER 2D
-Analyzes physical plausibility and consistency
-"""
 import cv2
 import numpy as np
 import torch
@@ -15,7 +11,6 @@ _midas_device = None
 
 
 def get_midas_model():
-    """Get cached MiDaS model (load once, reuse for all frames)"""
     global _midas_model, _midas_transform, _midas_device
     
     if _midas_model is None:
@@ -39,17 +34,6 @@ def get_midas_model():
 
 
 def analyze_physics_consistency(frame_paths):
-    """
-    Check physical consistency and plausibility
-    
-    Returns:
-        dict: {
-            'score': float (0-1, higher = more suspicious),
-            'lighting_consistent': bool,
-            'depth_plausible': bool,
-            'reflection_consistent': bool
-        }
-    """
     try:
         results = {
             'score': 0.0,
@@ -92,10 +76,6 @@ def analyze_physics_consistency(frame_paths):
 
 
 def analyze_lighting_consistency(frame_paths):
-    """
-    Analyze lighting consistency across frames
-    Sudden lighting changes can indicate splicing
-    """
     try:
         lighting_values = []
         
@@ -138,10 +118,6 @@ def analyze_lighting_consistency(frame_paths):
 
 
 def analyze_depth_consistency(frame_paths):
-    """
-    Estimate depth maps and check plausibility
-    Uses MiDaS pre-trained model
-    """
     try:
         depth_maps = []
         
@@ -180,7 +156,6 @@ def analyze_depth_consistency(frame_paths):
 
 
 def estimate_depth_midas(frame_path):
-    """Estimate depth using cached MiDaS model"""
     try:
         midas, transform, device = get_midas_model()
         
@@ -230,10 +205,6 @@ def estimate_depth_midas(frame_path):
 
 
 def analyze_shadows(frame_paths):
-    """
-    Analyze shadow consistency
-    Shadows should have consistent direction within a scene
-    """
     try:
         shadow_directions = []
         

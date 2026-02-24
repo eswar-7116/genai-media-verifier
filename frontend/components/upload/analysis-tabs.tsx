@@ -13,7 +13,6 @@ interface AnalysisTabsProps {
 export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsProps) {
   const [activeTab, setActiveTab] = useState('overview')
 
-  // Extract analysis data from the new API structure
   const breakdown = results.analysis_breakdown || {}
   const neuralData = breakdown.neural_network
   const frequencyData = breakdown.frequency_domain
@@ -23,7 +22,6 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
   const audioData = breakdown.audio_analysis
 
   const renderScoreBar = (score: number, label: string, anomaly?: boolean) => {
-    // Convert 0-1 scale to percentage
     const percentage = Math.round(score * 100)
     
     return (
@@ -77,7 +75,6 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
         <TabsTrigger value="report">Full Report</TabsTrigger>
       </TabsList>
 
-      {/* Overview Tab */}
       <TabsContent value="overview" className="space-y-6 p-6">
         <div>
           <h3 className="text-2xl font-bold mb-2">Analysis Summary</h3>
@@ -96,7 +93,7 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
           {neuralData && (
             <div className="p-6 bg-white border-2 border-gray-200 rounded-xl">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                🧠 Neural Network Analysis
+                Neural Network Analysis
               </h3>
               {renderScoreBar(neuralData.score, 'Detection Score')}
               <div className="mt-4 text-xs text-gray-500">
@@ -108,14 +105,14 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
           {frequencyData && (
             <div className="p-6 bg-white border-2 border-gray-200 rounded-xl">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                📊 Frequency Domain
+                Frequency Domain
               </h3>
               {renderScoreBar(frequencyData.score, 'Anomaly Score')}
               <div className="mt-4 space-y-1 text-xs text-gray-500">
-                {frequencyData.fft_anomaly && <div className="text-yellow-600">⚠️ FFT anomaly detected</div>}
-                {frequencyData.dct_anomaly && <div className="text-yellow-600">⚠️ DCT anomaly detected</div>}
+                {frequencyData.fft_anomaly && <div className="text-yellow-600">FFT anomaly detected</div>}
+                {frequencyData.dct_anomaly && <div className="text-yellow-600">DCT anomaly detected</div>}
                 {!frequencyData.fft_anomaly && !frequencyData.dct_anomaly && (
-                  <div className="text-green-600">✓ No major anomalies</div>
+                  <div className="text-green-600">No major anomalies</div>
                 )}
               </div>
             </div>
@@ -124,12 +121,12 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
           {facialData && (
             <div className="p-6 bg-white border-2 border-gray-200 rounded-xl">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                👤 Facial Forensics
+                Facial Forensics
               </h3>
               {renderScoreBar(facialData.score, 'Manipulation Score')}
               <div className="mt-4 text-xs text-gray-500">
                 {facialData.face_detected ? (
-                  <div className="text-green-600">✓ Face detected • {facialData.method_used}</div>
+                  <div className="text-green-600">Face detected • {facialData.method_used}</div>
                 ) : (
                   <div className="text-gray-500">No faces detected</div>
                 )}
@@ -140,17 +137,17 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
           {metadataData && (
             <div className="p-6 bg-white border-2 border-gray-200 rounded-xl">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                🔍 Metadata Forensics
+                Metadata Forensics
               </h3>
               {renderScoreBar(metadataData.score, 'Suspicion Score')}
               <div className="mt-4 space-y-1 text-xs text-gray-500">
                 {metadataData.exif_present ? (
-                  <div className="text-green-600">✓ EXIF data present</div>
+                  <div className="text-green-600">EXIF data present</div>
                 ) : (
-                  <div className="text-yellow-600">⚠️ No EXIF data</div>
+                  <div className="text-yellow-600">No EXIF data</div>
                 )}
                 {metadataData.ela_anomalies && (
-                  <div className="text-yellow-600">⚠️ ELA anomalies detected</div>
+                  <div className="text-yellow-600">ELA anomalies detected</div>
                 )}
               </div>
             </div>
@@ -158,7 +155,6 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
         </div>
       </TabsContent>
 
-      {/* Neural Network Tab */}
       {neuralData && (
         <TabsContent value="neural" className="space-y-6 p-6">
           <div className="space-y-4">
@@ -210,7 +206,6 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
         </TabsContent>
       )}
 
-      {/* Frequency Domain Tab */}
       {frequencyData && (
         <TabsContent value="frequency" className="space-y-6 p-6">
           <div className="space-y-4">
@@ -254,7 +249,6 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
         </TabsContent>
       )}
 
-      {/* Facial Analysis Tab */}
       {facialData && (
         <TabsContent value="facial" className="space-y-6 p-6">
           <div className="space-y-4">
@@ -303,7 +297,6 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
         </TabsContent>
       )}
 
-      {/* Metadata Tab */}
       {metadataData && (
         <TabsContent value="metadata" className="space-y-6 p-6">
           <div className="space-y-4">
@@ -326,7 +319,7 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
               <h4 className="font-semibold text-gray-900 mb-3">EXIF Status</h4>
               {metadataData.exif_present ? (
                 <div>
-                  <p className="text-sm text-green-700 mb-3">✓ EXIF data found</p>
+                  <p className="text-sm text-green-700 mb-3">EXIF data found</p>
                   {metadataData.metadata_details && Object.keys(metadataData.metadata_details).length > 0 ? (
                     <div className="space-y-1 text-sm">
                       {Object.entries(metadataData.metadata_details).slice(0, 8).map(([key, value]) => 
@@ -344,7 +337,7 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm text-yellow-700">⚠️ No EXIF data found</p>
+                  <p className="text-sm text-yellow-700">No EXIF data found</p>
                   <p className="text-xs text-gray-600 mt-2">
                     Missing EXIF data may indicate the file was processed, edited, or generated
                   </p>
@@ -374,7 +367,6 @@ export default function AnalysisTabs({ results, fileType, mode }: AnalysisTabsPr
         </TabsContent>
       )}
 
-      {/* Report Tab */}
       <TabsContent value="report" className="space-y-6 p-6">
         <div className="space-y-4">
           <div>

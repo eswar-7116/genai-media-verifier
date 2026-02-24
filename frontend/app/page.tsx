@@ -5,7 +5,6 @@ import { Github, Linkedin } from "lucide-react"
 import dynamic from 'next/dynamic'
 import HeroSection from "@/components/hero-section"
 
-// Global background effects - loaded once for entire page
 const AnoAI = dynamic(() => import("@/components/ui/animated-shader-background"), { 
   ssr: false,
   loading: () => (
@@ -18,7 +17,6 @@ const SnowParticles = dynamic(
   { ssr: false }
 )
 
-// Lazy load heavy components
 const HorizontalScrollFeatures = dynamic(
   () => import("@/components/ui/horizontal-scroll-features").then(mod => ({ default: mod.HorizontalScrollFeatures })),
   { ssr: false }
@@ -28,16 +26,13 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-black text-white selection:bg-cyan-500/30 overflow-x-hidden font-sans">
-      {/* Global background effects - single instances for entire page */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <AnoAI className="opacity-90" />
         <SnowParticles quantity={80} />
       </div>
 
-      {/* HERO SECTION */}
       <HeroSection />
 
-      {/* FEATURES SECTION - HORIZONTAL SCROLL */}
       <HorizontalScrollFeatures />
 
       <section id="demo" className="relative py-20 px-6 bg-[#050505] overflow-hidden z-10">
@@ -153,7 +148,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 5: FOOTER (Clean/Minimal) */}
       <footer className="py-24 px-6 border-t border-white/5 bg-black">
         <div className="container max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-20">

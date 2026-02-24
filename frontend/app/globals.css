@@ -128,7 +128,6 @@
     text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
   }
   .glass-card {
-    /* Fixed syntax error by ensuring there is a space between utility classes */
     background-color: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.1);

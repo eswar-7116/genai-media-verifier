@@ -11,23 +11,22 @@ export default function RiskGauge({ manipulationScore, riskLevel, gaugeType = 'r
   
   const getRiskConfig = () => {
     if (gaugeType === 'confidence') {
-      // Confidence levels
       let confidenceLevel = 'Low Confidence'
-      let color = '#ef4444' // red
+      let color = '#ef4444'
       
       if (manipulationScore >= 0.7) {
         confidenceLevel = 'High Confidence'
-        color = '#10b981' // green
+        color = '#10b981'
       } else if (manipulationScore >= 0.4) {
         confidenceLevel = 'Medium Confidence'
-        color = '#f59e0b' // yellow
+        color = '#f59e0b'
       }
       
       return {
         label: confidenceLevel.toUpperCase(),
         color: `text-[${color}]`,
         gaugeColor: color,
-        glowColor: `${color}4D` // 30% opacity
+        glowColor: `${color}4D`
       }
     }
     
@@ -60,7 +59,6 @@ export default function RiskGauge({ manipulationScore, riskLevel, gaugeType = 'r
     <div className="flex flex-col items-center space-y-6">
       <div className="relative">
         <svg width="280" height="280" viewBox="0 0 280 280" className="transform -rotate-90">
-          {/* Background circle */}
           <circle
             cx="140"
             cy="140"
@@ -69,7 +67,6 @@ export default function RiskGauge({ manipulationScore, riskLevel, gaugeType = 'r
             stroke="rgba(255, 255, 255, 0.05)"
             strokeWidth="16"
           />
-          {/* Animated gauge */}
           <circle
             cx="140"
             cy="140"
@@ -87,7 +84,6 @@ export default function RiskGauge({ manipulationScore, riskLevel, gaugeType = 'r
           />
         </svg>
 
-        {/* Center text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <div className={`text-7xl font-light tracking-wider ${config.color} mb-2`}
                style={{ 
@@ -102,7 +98,6 @@ export default function RiskGauge({ manipulationScore, riskLevel, gaugeType = 'r
         </div>
       </div>
 
-      {/* Label */}
       <div className="text-center">
         <div className={`text-lg font-light tracking-[3px] uppercase ${config.color}`}
              style={{ color: config.gaugeColor }}>

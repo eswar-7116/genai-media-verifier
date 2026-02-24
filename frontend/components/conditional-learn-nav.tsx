@@ -6,7 +6,6 @@ import { LearnNavigationPill } from "@/components/ui/learn-navigation-pill"
 export default function ConditionalLearnNav() {
   const pathname = usePathname()
   
-  // Only show on learn page
   if (pathname !== '/learn') {
     return null
   }

@@ -1,10 +1,57 @@
-# V.E.R.I.T.A.S
+<div align="center">
+  <img src="frontend/public/demos/veritas.jpeg" alt="V.E.R.I.T.A.S Logo" width="200"/>
+  
+  # V.E.R.I.T.A.S
+  
+  ### Verifiable Evidence & Risk Inference Through AI Systems
+  
+  AI-powered deepfake detection for images and videos.
+  
+  ---
+  
+  🌐 **[Live Frontend Demo](https://genai-media-verifier.vercel.app/)**
+  
+  ⚠️ **Note:** Backend is not connected on the live demo. Please run locally for full functionality.
+  
+  ---
+  
+</div>
 
-AI-powered deepfake detection for images and videos.
+## 📺 See It In Action
+
+**Image Analysis:**
+
+https://github.com/user-attachments/assets/veritas_image_test.mp4
+
+**Video Analysis:**
+
+https://github.com/user-attachments/assets/veritas_demo.mp4
+
+---
+
+## 📸 Screenshots
+
+**Landing Page:**
+
+![Landing Page](frontend/public/demos/landing_page.png)
+
+**Upload Interface:**
+
+![Upload Interface](frontend/public/demos/upload.png)
+
+**Risk Assessment:**
+
+![Risk Assessment](frontend/public/demos/risk_assessment.png)
+
+**Analysis Dashboard:**
+
+![Dashboard](frontend/public/demos/dashboard.png)
+
+---
 
 ## What is this?
 
-V.E.R.I.T.A.S (Verification Engine for Real-time Image and Text Authenticity Scanning) analyzes media files to detect potential deepfakes and manipulation. Upload an image or video, and get a detailed analysis of authenticity markers.
+V.E.R.I.T.A.S (Verifiable Evidence & Risk Inference Through AI Systems) analyzes media files to detect potential deepfakes and manipulation. Upload an image or video, and get a detailed analysis of authenticity markers.
 
 ## Features
 
@@ -13,6 +60,8 @@ V.E.R.I.T.A.S (Verification Engine for Real-time Image and Text Authenticity Sca
 - Real-time analysis with progress tracking
 - Educational resources explaining how detection works
 - Clean, modern UI
+- Quick analysis mode for faster results (videos)
+- Comprehensive analysis mode for detailed reports
 
 ## Tech Stack
 
@@ -20,6 +69,7 @@ V.E.R.I.T.A.S (Verification Engine for Real-time Image and Text Authenticity Sca
 - Next.js 16 with React 19
 - TypeScript
 - Tailwind CSS
+- D3.js for data visualization
 - Three.js for 3D effects
 - Framer Motion for animations
 
@@ -53,7 +103,7 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-Frontend runs on `http://localhost:3000`
+Frontend runs on `http://localhost:3000`  
 Backend runs on `http://localhost:8000`
 
 ## Project Structure
@@ -71,34 +121,45 @@ Backend runs on `http://localhost:8000`
 
 ## How It Works
 
-The system uses 8 different detection methods:
+The system uses multiple detection methods:
 
-1. **Facial Analysis** - Checks landmarks, symmetry, texture
-2. **Motion Tracking** - Identifies unnatural movement in videos
-3. **Lighting Analysis** - Evaluates shadow consistency
-4. **Audio-Visual Sync** - Checks lip-sync accuracy
-5. **Background Examination** - Looks for edge artifacts
-6. **Frequency Analysis** - Detects GAN fingerprints
-7. **Eye/Blink Patterns** - Analyzes natural eye behavior
-8. **Metadata Check** - Examines file properties
+**For Images:**
+1. **Neural Networks** - Multiple model ensemble for deepfake detection
+2. **Frequency Domain Analysis** - DCT/FFT anomaly detection
+3. **Facial Forensics** - Landmark and texture analysis
+4. **Metadata Inspection** - EXIF data validation
 
-Each method contributes to an overall confidence score.
+**For Videos:**
+1. **Frame-based Analysis** - Per-frame deepfake detection
+2. **Temporal Consistency** - Identity shift detection across frames
+3. **Video Model Analysis** - Global coherence checking (VideoMAE)
+4. **Physiological Signals** - Blink patterns and heartbeat detection
+5. **Physics Consistency** - Lighting and depth validation
+6. **Audio Analysis** - Audio presence and sync validation
+7. **Metadata Forensics** - Suspicious indicators
+
+Each method contributes to an overall confidence score and risk level.
 
 ## API
 
 **Analyze Image:**
 ```bash
-POST /analyze-image
+POST /analyze/image
 Content-Type: multipart/form-data
+Body: { file: <image_file> }
 ```
 
 **Analyze Video:**
 ```bash
-POST /analyze-video
+POST /analyze/video
 Content-Type: multipart/form-data
+Body: { 
+  file: <video_file>,
+  mode: "quick" | "deep"  # optional, defaults to "deep"
+}
 ```
 
-Full API docs available at `/docs` when running the backend.
+Full API docs available at `http://localhost:8000/docs` when running the backend.
 
 ## Environment Variables
 
@@ -111,15 +172,31 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 MODEL_CACHE_DIR=./models_cache
 UPLOAD_DIR=./uploads
-MAX_FILE_SIZE=100000000
+TEMP_DIR=./temp
+MAX_FILE_SIZE=52428800
 ```
+
+## Supported Formats
+
+**Images:** JPG, PNG, BMP, WEBP  
+**Videos:** MP4, AVI, MOV, MKV  
+**Max file size:** 50MB
 
 ## Notes
 
 - First run downloads AI models automatically (can take a few minutes)
 - Video analysis takes longer than images
-- Large files might timeout - adjust `MAX_FILE_SIZE` if needed
+- Quick mode skips some analysis layers for faster results
 - The `models_cache/` and `uploads/` directories are gitignored
+- Results are probabilistic and should be combined with human judgment
+
+## Limitations
+
+This tool provides probabilistic assessments, not definitive proof. Results should be used alongside:
+- Contextual analysis
+- Source verification
+- Chain of custody validation
+- Expert human judgment
 
 ## Contributing
 

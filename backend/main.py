@@ -21,10 +21,8 @@ import config
 
 app = FastAPI(title="Deepfake Detection API", version="2.0")
 
-# Thread pool for running heavy analysis without blocking SSE
 executor = ThreadPoolExecutor(max_workers=2)
 
-# Enable CORS for frontend - using config from environment
 app.add_middleware(
     CORSMiddleware,
     allow_origins=config.CORS_ORIGINS,
@@ -39,7 +37,6 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 def validate_file(file: UploadFile, allowed_extensions: set):
-    """Validate file type and size"""
     file_ext = os.path.splitext(file.filename)[1].lower()
     
     if file_ext not in allowed_extensions:
@@ -53,7 +50,6 @@ def validate_file(file: UploadFile, allowed_extensions: set):
 
 @app.get("/")
 async def root():
-    """API root endpoint"""
     return {
         "message": "Deepfake Detection API",
         "version": "2.0",
@@ -69,7 +65,6 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
     return {
         "status": "healthy",
         "features": {
@@ -83,10 +78,6 @@ async def health_check():
 
 @app.post("/analyze/image")
 async def analyze_image(file: UploadFile = File(...)):
-    """
-    Quick image analysis using single neural network.
-    Faster but less comprehensive than /analyze/image/comprehensive
-    """
     try:
         validate_file(file, config.ALLOWED_IMAGE_EXTENSIONS)
         
@@ -111,7 +102,6 @@ async def analyze_image(file: UploadFile = File(...)):
             risk_level=risk
         )
         
-        # Cleanup
         try:
             os.remove(path)
         except:
@@ -132,19 +122,9 @@ async def analyze_image(file: UploadFile = File(...)):
 
 @app.post("/analyze/image/comprehensive")
 async def analyze_image_comprehensive_endpoint(file: UploadFile = File(...)):
-    """
-    Comprehensive image analysis using all detection methods:
-    - Neural network ensemble (multiple models)
-    - Frequency domain analysis (FFT/DCT)
-    - Facial analysis (landmarks, symmetry, texture)
-    - Metadata forensics (EXIF, ELA)
-    
-    Slower but more accurate and robust.
-    """
     try:
         validate_file(file, config.ALLOWED_IMAGE_EXTENSIONS)
         
-        # Reset progress tracker for new analysis
         reset_progress_tracker()
         tracker = get_progress_tracker()
         
@@ -155,7 +135,6 @@ async def analyze_image_comprehensive_endpoint(file: UploadFile = File(...)):
         
         tracker.update("File uploaded successfully")
         
-        # Run comprehensive analysis in background thread to not block SSE
         loop = asyncio.get_event_loop()
         results = await loop.run_in_executor(
             executor,
@@ -163,21 +142,17 @@ async def analyze_image_comprehensive_endpoint(file: UploadFile = File(...)):
             path
         )
         
-        # Check for errors
         if results is None or 'error' in results:
             error_msg = results.get('error', 'Analysis failed') if results else 'Analysis returned no results'
             raise HTTPException(status_code=500, detail=error_msg)
         
-        # Generate detailed report
         report = generate_comprehensive_report(results)
         
-        # Cleanup
         try:
             os.remove(path)
         except:
             pass
         
-        # Build response with safe defaults
         response = {
             "final_score": round(results.get('final_score', 0.5), 3),
             "risk_level": results.get('risk_level', 'Unknown'),
@@ -186,7 +161,6 @@ async def analyze_image_comprehensive_endpoint(file: UploadFile = File(...)):
             "report": report
         }
         
-        # Add detailed breakdown if enabled
         if config.ENABLE_DETAILED_BREAKDOWN:
             response["analysis_breakdown"] = {
                 "neural_network": results.get('neural_network'),
@@ -209,15 +183,11 @@ async def analyze_image_comprehensive_endpoint(file: UploadFile = File(...)):
 
 @app.get("/analyze/progress")
 async def get_analysis_progress():
-    """
-    Server-Sent Events endpoint for real-time progress updates
-    IMPROVED: Better error handling and connection stability
-    """
     async def event_generator():
         tracker = get_progress_tracker()
         message_queue = Queue()
         last_heartbeat = time.time()
-        max_idle_time = 30  # Close connection after 30 seconds of no activity
+        max_idle_time = 30
         
         def callback(message):
             try:
@@ -230,25 +200,21 @@ async def get_analysis_progress():
         try:
             while True:
                 try:
-                    # Check for new messages with timeout
                     if not message_queue.empty():
                         message = message_queue.get_nowait()
                         data = json.dumps({'message': message})
                         yield f"data: {data}\n\n"
                         last_heartbeat = time.time()
                     else:
-                        # Check if connection has been idle too long
                         current_time = time.time()
                         if current_time - last_heartbeat > max_idle_time:
                             print(f"SSE connection idle for {max_idle_time}s, closing...")
                             break
                         
-                        # Send heartbeat every 15 seconds to keep connection alive
                         if current_time - last_heartbeat > 15:
                             yield f": heartbeat\n\n"
                             last_heartbeat = current_time
                         
-                        # Small sleep to prevent CPU spinning
                         await asyncio.sleep(0.1)
                         
                 except Exception as e:
@@ -256,10 +222,8 @@ async def get_analysis_progress():
                     await asyncio.sleep(0.1)
                     
         except (asyncio.CancelledError, GeneratorExit) as e:
-            # Client disconnected - clean up gracefully
             print(f"SSE connection closed: {type(e).__name__}")
         finally:
-            # Always try to remove callback on exit
             try:
                 if callback in tracker.callbacks:
                     tracker.callbacks.remove(callback)
@@ -280,10 +244,6 @@ async def get_analysis_progress():
 
 @app.post("/analyze/video")
 async def analyze_video_endpoint(file: UploadFile = File(...)):
-    """
-    OLD Simple video analysis (frame-by-frame only).
-    Use /analyze/video/comprehensive for full hybrid detection.
-    """
     try:
         validate_file(file, config.ALLOWED_VIDEO_EXTENSIONS)
         
@@ -294,7 +254,6 @@ async def analyze_video_endpoint(file: UploadFile = File(...)):
         
         result = analyze_video(video_path)
         
-        # Cleanup
         try:
             os.remove(video_path)
         except:
@@ -313,30 +272,21 @@ async def analyze_video_endpoint(file: UploadFile = File(...)):
 
 @app.post("/analyze/video/quick")
 async def analyze_video_quick_endpoint(file: UploadFile = File(...)):
-    """
-    Quick video deepfake detection (Layers 1, 2A, 2B only).
-    Faster but potentially less accurate than comprehensive analysis.
-    Skips: Physiological analysis, Physics checks, and Specialized detection.
-    """
     try:
         validate_file(file, config.ALLOWED_VIDEO_EXTENSIONS)
         
-        # Reset progress tracker for new analysis
         reset_progress_tracker()
         tracker = get_progress_tracker()
         
         video_path = os.path.join(UPLOAD_DIR, file.filename)
         
-        # Save uploaded file
         with open(video_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
         tracker.update("File uploaded successfully")
         
-        # Import quick detector
         from models.video.quick_detector import analyze_video_quick
         
-        # Run quick analysis in background thread
         loop = asyncio.get_event_loop()
         results = await loop.run_in_executor(
             executor,
@@ -344,7 +294,6 @@ async def analyze_video_quick_endpoint(file: UploadFile = File(...)):
             video_path
         )
         
-        # Cleanup uploaded file and temp frames
         try:
             os.remove(video_path)
         except:
@@ -357,14 +306,12 @@ async def analyze_video_quick_endpoint(file: UploadFile = File(...)):
         except:
             pass
         
-        # Check for errors
         if results is None:
             raise HTTPException(status_code=500, detail="Analysis returned no results")
             
         if 'error' in results:
             raise HTTPException(status_code=500, detail=results['error'])
         
-        # Build response
         response = {
             "final_score": round(results.get('final_score', 0.5), 3),
             "risk_level": results.get('risk_level', 'Unknown'),
@@ -374,10 +321,8 @@ async def analyze_video_quick_endpoint(file: UploadFile = File(...)):
             "warning": "Quick analysis - some detection layers were skipped for speed"
         }
         
-        # Add layer summaries
         response["layer_summaries"] = {}
         
-        # Layer 1: Metadata
         if results.get('layer1_metadata'):
             meta = results['layer1_metadata']
             response["layer_summaries"]["metadata"] = {
@@ -385,7 +330,6 @@ async def analyze_video_quick_endpoint(file: UploadFile = File(...)):
                 "has_audio": meta.get('has_audio', False)
             }
         
-        # Layer 2A: Visual
         response["layer_summaries"]["visual"] = {}
         
         if results.get('layer2a_frame_based'):
@@ -409,7 +353,6 @@ async def analyze_video_quick_endpoint(file: UploadFile = File(...)):
                 "score": round(video3d.get('score', 0), 3)
             }
         
-        # Layer 2B: Audio
         if results.get('layer2b_audio'):
             audio = results['layer2b_audio']
             if audio.get('has_audio'):
@@ -433,56 +376,21 @@ async def analyze_video_quick_endpoint(file: UploadFile = File(...)):
 
 @app.post("/analyze/video/comprehensive")
 async def analyze_video_comprehensive_endpoint(file: UploadFile = File(...)):
-    """
-    Comprehensive HYBRID video deepfake detection:
-    
-    LAYER 1 - Pre-Analysis:
-    - Metadata forensics (encoding, frame rate, resolution)
-    - Audio presence check
-    
-    LAYER 2 - Multi-Modal Analysis:
-    A. VISUAL STREAM (Hybrid):
-       - Smart frame extraction (scene detection, faces, boundaries)
-       - Frame-based ensemble analysis
-       - Temporal consistency (landmark tracking, identity persistence)
-       - 3D video model analysis (VideoMAE)
-    
-    B. AUDIO STREAM (if present):
-       - Voice deepfake detection
-       - Lip-sync analysis
-       - Audio consistency checks
-    
-    C. PHYSIOLOGICAL SIGNALS:
-       - Heartbeat detection (rPPG)
-       - Blink pattern analysis
-       - Breathing detection
-    
-    D. PHYSICS & CONSISTENCY:
-       - Lighting consistency
-       - Depth estimation (MiDaS)
-       - Shadow analysis
-    
-    Returns detailed multi-modal analysis with high confidence scoring.
-    """
     try:
         validate_file(file, config.ALLOWED_VIDEO_EXTENSIONS)
         
-        # Reset progress tracker for new analysis
         reset_progress_tracker()
         tracker = get_progress_tracker()
         
         video_path = os.path.join(UPLOAD_DIR, file.filename)
         
-        # Save uploaded file
         with open(video_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
         tracker.update("File uploaded successfully")
         
-        # Import comprehensive detector
         from models.video.comprehensive_detector import analyze_video_comprehensive
         
-        # Run full hybrid analysis in background thread to not block SSE
         loop = asyncio.get_event_loop()
         results = await loop.run_in_executor(
             executor,
@@ -490,7 +398,6 @@ async def analyze_video_comprehensive_endpoint(file: UploadFile = File(...)):
             video_path
         )
         
-        # Cleanup uploaded file and temp frames
         try:
             os.remove(video_path)
         except:
@@ -503,14 +410,12 @@ async def analyze_video_comprehensive_endpoint(file: UploadFile = File(...)):
         except:
             pass
         
-        # Check for errors
         if results is None:
             raise HTTPException(status_code=500, detail="Analysis returned no results")
             
         if 'error' in results:
             raise HTTPException(status_code=500, detail=results['error'])
         
-        # Build response with safe defaults
         response = {
             "final_score": round(results.get('final_score', 0.5), 3),
             "risk_level": results.get('risk_level', 'Unknown'),
@@ -519,10 +424,8 @@ async def analyze_video_comprehensive_endpoint(file: UploadFile = File(...)):
             "method_breakdown": results.get('method_breakdown', {})
         }
         
-        # Add layer summaries with safe gets
         response["layer_summaries"] = {}
         
-        # Layer 1: Metadata
         if results.get('layer1_metadata'):
             meta = results['layer1_metadata']
             response["layer_summaries"]["metadata"] = {
@@ -531,7 +434,6 @@ async def analyze_video_comprehensive_endpoint(file: UploadFile = File(...)):
                 "suspicious_indicators": meta.get('suspicious_indicators', [])
             }
         
-        # Layer 2A: Visual
         response["layer_summaries"]["visual"] = {}
         
         if results.get('layer2a_frame_based'):
@@ -559,7 +461,6 @@ async def analyze_video_comprehensive_endpoint(file: UploadFile = File(...)):
                 "method": video3d.get('method', 'unknown')
             }
         
-        # Layer 2B: Audio
         if results.get('layer2b_audio'):
             audio = results['layer2b_audio']
             if audio.get('has_audio'):
@@ -572,7 +473,6 @@ async def analyze_video_comprehensive_endpoint(file: UploadFile = File(...)):
             else:
                 response["layer_summaries"]["audio"] = {"present": False}
         
-        # Layer 2C: Physiological
         if results.get('layer2c_physiological'):
             physio = results['layer2c_physiological']
             response["layer_summaries"]["physiological"] = {
@@ -584,7 +484,6 @@ async def analyze_video_comprehensive_endpoint(file: UploadFile = File(...)):
                 "anomalies": physio.get('anomalies', [])
             }
         
-        # Layer 2D: Physics
         if results.get('layer2d_physics'):
             physics = results['layer2d_physics']
             response["layer_summaries"]["physics"] = {
@@ -594,7 +493,6 @@ async def analyze_video_comprehensive_endpoint(file: UploadFile = File(...)):
                 "anomalies": physics.get('anomalies', [])
             }
         
-        # Layer 3: Specialized
         response["layer_summaries"]["specialized"] = {}
         
         if results.get('layer3_boundary'):
@@ -628,7 +526,6 @@ async def analyze_video_comprehensive_endpoint(file: UploadFile = File(...)):
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize models on startup"""
     print("Initializing deepfake detection system...")
     print(f"Device: {config.MODEL_CONFIG['device']}")
     print(f"Features enabled:")
@@ -638,7 +535,6 @@ async def startup_event():
     print(f"  - Metadata Analysis: {config.METADATA_ANALYSIS_ENABLED}")
     print(f"  - Hybrid Video Detection: Available (Layer 1 + 2)")
     
-    # Preload models
     if config.NEURAL_ENSEMBLE_ENABLED:
         from models.ensemble_detector import get_ensemble_detector
         get_ensemble_detector()
@@ -663,7 +559,6 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     host = os.getenv("HOST", "0.0.0.0")
     
-    # Auto-reload in development, disabled in production
     reload = os.getenv("ENVIRONMENT", "development") == "development"
     
     uvicorn.run(

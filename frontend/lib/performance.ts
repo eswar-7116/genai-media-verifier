@@ -1,24 +1,13 @@
-/**
- * Performance optimization utilities
- */
-
-// Detect if the device is low-performance
 export const isLowPerformanceDevice = (): boolean => {
   if (typeof window === 'undefined') return false;
   
-  // Check for mobile devices
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  
-  // Check for low CPU cores
   const cpuCores = navigator.hardwareConcurrency || 4;
-  
-  // Check for low memory (if available)
   const memory = (navigator as any).deviceMemory;
   
   return isMobile || cpuCores < 4 || (memory && memory < 4);
 };
 
-// Request idle callback with fallback
 export const requestIdleCallback = (
   callback: IdleRequestCallback,
   options?: IdleRequestOptions
@@ -26,7 +15,6 @@ export const requestIdleCallback = (
   if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
     return window.requestIdleCallback(callback, options);
   }
-  // Fallback to setTimeout
   return setTimeout(() => {
     const start = Date.now();
     callback({
@@ -36,7 +24,6 @@ export const requestIdleCallback = (
   }, 1) as unknown as number;
 };
 
-// Cancel idle callback with fallback
 export const cancelIdleCallback = (id: number): void => {
   if (typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
     window.cancelIdleCallback(id);
@@ -45,7 +32,6 @@ export const cancelIdleCallback = (id: number): void => {
   }
 };
 
-// Throttle function for performance
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
   delay: number
@@ -69,7 +55,6 @@ export function throttle<T extends (...args: any[]) => any>(
   };
 }
 
-// Debounce function for performance
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   delay: number
@@ -82,7 +67,6 @@ export function debounce<T extends (...args: any[]) => any>(
   };
 }
 
-// Check if browser supports WebGL2
 export const hasWebGL2Support = (): boolean => {
   if (typeof window === 'undefined') return false;
   
@@ -95,7 +79,6 @@ export const hasWebGL2Support = (): boolean => {
   }
 };
 
-// Preload critical resources
 export const preloadResource = (href: string, as: string): void => {
   if (typeof document === 'undefined') return;
   
@@ -106,7 +89,6 @@ export const preloadResource = (href: string, as: string): void => {
   document.head.appendChild(link);
 };
 
-// Lazy load images with Intersection Observer
 export const lazyLoadImage = (img: HTMLImageElement): void => {
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => {
@@ -123,14 +105,12 @@ export const lazyLoadImage = (img: HTMLImageElement): void => {
     });
     observer.observe(img);
   } else {
-    // Fallback for browsers without Intersection Observer
     if (img.dataset.src) {
       img.src = img.dataset.src;
     }
   }
 };
 
-// Measure performance
 export const measurePerformance = (name: string, fn: () => void): void => {
   if (typeof window === 'undefined' || !window.performance) {
     fn();
@@ -150,6 +130,5 @@ export const measurePerformance = (name: string, fn: () => void): void => {
     const measure = performance.getEntriesByName(measureName)[0];
     console.log(`${name} took ${measure.duration.toFixed(2)}ms`);
   } catch (e) {
-    // Ignore errors in performance measurement
   }
 };

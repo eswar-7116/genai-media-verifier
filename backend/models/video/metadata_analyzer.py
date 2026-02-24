@@ -1,7 +1,3 @@
-"""
-Video Metadata Forensics - LAYER 1
-Analyzes video metadata for manipulation indicators
-"""
 import cv2
 import json
 import subprocess
@@ -10,17 +6,6 @@ from datetime import datetime
 
 
 def analyze_video_metadata(video_path):
-    """
-    Comprehensive video metadata analysis
-    
-    Returns:
-        dict: {
-            'score': float (0-1, higher = more suspicious),
-            'suspicious_indicators': list,
-            'metadata': dict,
-            'has_audio': bool
-        }
-    """
     try:
         results = {
             'score': 0.0,
@@ -32,13 +17,11 @@ def analyze_video_metadata(video_path):
             'resolution_changes': False
         }
         
-        # Open video with OpenCV
         cap = cv2.VideoCapture(video_path)
         
         if not cap.isOpened():
             return {'score': 0.5, 'error': 'Cannot open video'}
         
-        # Basic metadata
         fps = cap.get(cv2.CAP_PROP_FPS)
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -56,16 +39,13 @@ def analyze_video_metadata(video_path):
         
         cap.release()
         
-        # FFprobe analysis for detailed metadata
         ffprobe_data = get_ffprobe_metadata(video_path)
         
         if ffprobe_data:
             results['metadata'].update(ffprobe_data)
             
-            # Check audio presence
             results['has_audio'] = ffprobe_data.get('has_audio', False)
             
-            # Check for re-encoding indicators
             encoding_indicators = check_encoding_history(ffprobe_data)
             results['encoding_history'] = encoding_indicators
             
@@ -73,35 +53,27 @@ def analyze_video_metadata(video_path):
                 results['suspicious_indicators'].append('Multiple encoding passes detected')
                 results['score'] += 0.3
             
-            # Check frame rate consistency
             if 'variable_frame_rate' in ffprobe_data and ffprobe_data['variable_frame_rate']:
                 results['suspicious_indicators'].append('Variable frame rate detected')
                 results['frame_rate_consistent'] = False
                 results['score'] += 0.2
             
-            # Check for resolution changes (indicates splicing)
             if 'resolution_changes' in ffprobe_data and ffprobe_data['resolution_changes']:
                 results['suspicious_indicators'].append('Resolution changes mid-video')
                 results['resolution_changes'] = True
                 results['score'] += 0.4
             
-            # Check creation/modification dates
             file_stats = os.stat(video_path)
             created_time = datetime.fromtimestamp(file_stats.st_ctime)
             modified_time = datetime.fromtimestamp(file_stats.st_mtime)
             
-            # If creation date is in metadata
             if 'creation_time' in ffprobe_data:
                 meta_creation = ffprobe_data['creation_time']
-                # Compare with file system dates
-                # Large discrepancies can indicate manipulation
             
-            # Check for missing metadata (common in manipulated videos)
             if not ffprobe_data.get('encoder'):
                 results['suspicious_indicators'].append('No encoder information')
                 results['score'] += 0.15
         
-        # Normalize score
         results['score'] = min(results['score'], 1.0)
         
         return results
@@ -116,20 +88,16 @@ def analyze_video_metadata(video_path):
 
 
 def get_ffprobe_metadata(video_path):
-    """Extract detailed metadata using ffprobe"""
     try:
-        # Try multiple ways to find ffprobe
         ffprobe_path = None
         
-        # Method 1: Check environment variable
         ffmpeg_path = os.getenv("FFMPEG_PATH")
         if ffmpeg_path:
             ffprobe_path = ffmpeg_path.replace("ffmpeg", "ffprobe")
         
-        # Method 2: Try common installation paths
         if not ffprobe_path or not os.path.exists(ffprobe_path):
             common_paths = [
-                "ffprobe",  # Try PATH
+                "ffprobe",
                 "ffprobe.exe",
                 r"C:\ffmpeg\bin\ffprobe.exe",
                 r"C:\Program Files\ffmpeg\bin\ffprobe.exe",
@@ -138,13 +106,12 @@ def get_ffprobe_metadata(video_path):
             
             for path in common_paths:
                 try:
-                    # Test if this path works
                     result = subprocess.run(
                         [path, "-version"],
                         capture_output=True,
                         text=True,
                         timeout=5,
-                        shell=True  # Use shell to resolve PATH
+                        shell=True
                     )
                     if result.returncode == 0:
                         ffprobe_path = path
@@ -170,7 +137,7 @@ def get_ffprobe_metadata(video_path):
             capture_output=True, 
             text=True, 
             timeout=30,
-            shell=True  # Use shell to resolve PATH
+            shell=True
         )
         
         if result.returncode != 0:
@@ -178,10 +145,8 @@ def get_ffprobe_metadata(video_path):
         
         data = json.loads(result.stdout)
         
-        # Parse metadata
         metadata = {}
         
-        # Format info
         if 'format' in data:
             fmt = data['format']
             metadata['duration'] = float(fmt.get('duration', 0))
@@ -193,7 +158,6 @@ def get_ffprobe_metadata(video_path):
                 metadata['encoder'] = tags.get('encoder', '')
                 metadata['creation_time'] = tags.get('creation_time', '')
         
-        # Stream info
         if 'streams' in data:
             video_streams = [s for s in data['streams'] if s['codec_type'] == 'video']
             audio_streams = [s for s in data['streams'] if s['codec_type'] == 'audio']
@@ -207,7 +171,6 @@ def get_ffprobe_metadata(video_path):
                 metadata['video_codec'] = vs.get('codec_name', '')
                 metadata['pix_fmt'] = vs.get('pix_fmt', '')
                 
-                # Check for variable frame rate
                 avg_fps = vs.get('avg_frame_rate', '0/0')
                 r_fps = vs.get('r_frame_rate', '0/0')
                 
@@ -222,19 +185,15 @@ def get_ffprobe_metadata(video_path):
 
 
 def check_encoding_history(metadata):
-    """Check for signs of multiple encoding passes"""
     indicators = []
     
-    # Low bit rate for high resolution suggests re-encoding
     bit_rate = metadata.get('bit_rate', 0)
     
-    # Check encoder string for multiple passes
     encoder = metadata.get('encoder', '').lower()
     
     if 'handbrake' in encoder or 'x264' in encoder:
         indicators.append('Re-encoded with video software')
     
-    # Multiple video streams can indicate splicing
     if metadata.get('num_video_streams', 1) > 1:
         indicators.append('Multiple video streams detected')
     
@@ -242,10 +201,8 @@ def check_encoding_history(metadata):
 
 
 def check_audio_presence(video_path):
-    """Quick check if video has audio"""
     try:
         cap = cv2.VideoCapture(video_path)
-        # OpenCV doesn't reliably detect audio, use ffprobe
         cap.release()
         
         metadata = get_ffprobe_metadata(video_path)

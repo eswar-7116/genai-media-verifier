@@ -15,7 +15,7 @@ interface UploadSectionProps {
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/bmp', 'image/webp']
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/avi', 'video/quicktime', 'video/x-matroska']
-const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+const MAX_FILE_SIZE = 50 * 1024 * 1024
 
 export default function UploadSection({ 
   file, 
@@ -82,11 +82,9 @@ export default function UploadSection({
   return (
     <>
       <section className="relative flex items-center justify-center px-6 overflow-hidden h-screen">
-        {/* Background Grid */}
         <div className="absolute inset-0 bg-grid opacity-20" />
         
         <div className="relative w-full max-w-3xl space-y-6 z-10">
-          {/* Header */}
           <div className="text-center space-y-2 animate-fade-in-up">
             <p className="text-xs font-light tracking-[3px] uppercase text-white/50">
               AI-POWERED VERIFICATION
@@ -99,7 +97,6 @@ export default function UploadSection({
             </p>
           </div>
 
-          {/* Upload Zone */}
           <div
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
@@ -161,7 +158,6 @@ export default function UploadSection({
               )}
             </label>
 
-            {/* Scan line effect on hover */}
             {!file && (
               <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent h-32 animate-scan" />
@@ -169,7 +165,6 @@ export default function UploadSection({
             )}
           </div>
 
-          {/* File Type Info */}
           <div 
             className="text-center space-y-1 animate-fade-in-up opacity-0"
             style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}
@@ -182,20 +177,17 @@ export default function UploadSection({
             <p className="text-[10px] text-white/30 tracking-wider">Maximum file size: 50 MB</p>
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="glass-card border-red-500/30 bg-red-500/10 rounded-2xl p-3 text-red-400 text-center tracking-wide animate-fade-in-up text-sm">
               {error}
             </div>
           )}
 
-          {/* Analysis Buttons */}
           {file && (
             <div 
               className="flex flex-col gap-4 animate-fade-in-up opacity-0"
               style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}
             >
-              {/* For Images: Single Button */}
               {!isVideoFile && (
                 <div className="flex justify-center">
                   <button
@@ -212,11 +204,9 @@ export default function UploadSection({
                 </div>
               )}
 
-              {/* For Videos: Two Buttons */}
               {isVideoFile && (
                 <>
                   <div className="grid grid-cols-2 gap-4">
-                    {/* Quick Analysis Button */}
                     <button
                       onClick={handleQuickAnalysis}
                       disabled={disabled}
@@ -230,7 +220,6 @@ export default function UploadSection({
                       </div>
                     </button>
 
-                    {/* Full Analysis Button */}
                     <button
                       onClick={() => onAnalyze('deep')}
                       disabled={disabled}
@@ -277,7 +266,6 @@ export default function UploadSection({
         `}</style>
       </section>
 
-      {/* Quick Analysis Warning Modal */}
       {showQuickWarning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
           <div className="relative glass-card border-yellow-500/40 rounded-2xl p-8 max-w-md w-full space-y-6 animate-scale-in">

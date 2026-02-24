@@ -40,12 +40,10 @@ export default function ResultsDashboard({
 
   return (
     <section id="results-section" className="relative py-20 px-6 overflow-hidden">
-      {/* Background Grid */}
       <div className="absolute inset-0 bg-grid opacity-20" />
       
       <div className="relative max-w-7xl mx-auto space-y-16 z-10">
         
-        {/* Header */}
         <div className="text-center space-y-4 animate-fade-in-up">
           <p className="text-sm font-light tracking-[3px] uppercase text-white/50">
             ANALYSIS COMPLETE
@@ -55,12 +53,10 @@ export default function ResultsDashboard({
           </h2>
         </div>
 
-        {/* Risk Gauge, Confidence, and Key Indicators Row */}
         <div 
           className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start animate-fade-in-up opacity-0"
           style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}
         >
-          {/* Risk Gauge */}
           <div className="flex justify-center">
             <div className="bg-[#1a1a1a] border border-white/10 rounded-3xl p-8 w-full">
               <RiskGauge 
@@ -71,7 +67,6 @@ export default function ResultsDashboard({
             </div>
           </div>
 
-          {/* Confidence Gauge */}
           <div className="flex justify-center">
             <div className="bg-[#1a1a1a] border border-white/10 rounded-3xl p-8 w-full">
               <RiskGauge 
@@ -82,7 +77,6 @@ export default function ResultsDashboard({
             </div>
           </div>
 
-          {/* Key Indicators */}
           <div className="flex items-center">
             <div className="bg-[#1a1a1a] border border-white/10 rounded-3xl p-8 w-full">
               <KeyIndicators 
@@ -93,7 +87,6 @@ export default function ResultsDashboard({
           </div>
         </div>
 
-        {/* Signals Overview */}
         <div 
           className="animate-fade-in-up opacity-0"
           style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}
@@ -106,7 +99,6 @@ export default function ResultsDashboard({
           />
         </div>
 
-        {/* Technical Analysis */}
         <div 
           className="animate-fade-in-up opacity-0"
           style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}
@@ -119,7 +111,6 @@ export default function ResultsDashboard({
           </div>
         </div>
 
-        {/* Disclaimer */}
         <div 
           className="animate-fade-in-up opacity-0"
           style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}
@@ -137,7 +128,6 @@ export default function ResultsDashboard({
           </div>
         </div>
 
-        {/* Actions */}
         <div 
           className="flex items-center justify-center gap-6 pt-8 animate-fade-in-up opacity-0"
           style={{ animationDelay: '1s', animationFillMode: 'forwards' }}

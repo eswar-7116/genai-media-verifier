@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react"
 
 export default function SplashCursor({
-  DYE_RESOLUTION = 512, // Reduced from 1440
+  DYE_RESOLUTION = 512,
   DENSITY_DISSIPATION = 3.5,
   VELOCITY_DISSIPATION = 2,
   CURL = 3,
@@ -12,7 +12,6 @@ export default function SplashCursor({
   const [isLowPerformance, setIsLowPerformance] = useState(false)
 
   useEffect(() => {
-    // Performance detection
     const checkPerformance = () => {
       const gl = document.createElement('canvas').getContext('webgl2')
       if (!gl) {
@@ -27,23 +26,16 @@ export default function SplashCursor({
     const canvas = canvasRef.current
     if (!canvas) return
 
-    // Disable on mobile devices
     if (window.innerWidth < 768) {
       setIsLowPerformance(true)
       return
     }
 
     console.log("[SplashCursor] Initializing with reduced resolution:", DYE_RESOLUTION)
-
-    // Placeholder for actual WebGL implementation
-    // The full implementation would go here but is disabled for performance
     
-    return () => {
-      // Cleanup
-    }
+    return () => {}
   }, [])
 
-  // Don't render on low performance devices
   if (isLowPerformance) {
     return null
   }
